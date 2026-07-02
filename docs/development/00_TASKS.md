@@ -8,7 +8,7 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 - [x] Buat Landing Page untuk promosi project finance dashboard
 - [x] Buat app shell: sidebar, header, mobile navigation.
 - [x] Buat utilities: currency, date, percentage, status formatter.
-- [ ] Buat dummy data: workspace, accounts, categories, transactions, budgets.
+- [x] Buat dummy data: workspace, accounts, categories, transactions, budgets.
 - [ ] Buat dashboard overview: metric cards, chart, recent transactions.
 - [ ] Buat transactions list: table, search, filter, pagination.
 - [ ] Buat transaction form: create, edit, detail, validation.
