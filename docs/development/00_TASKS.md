@@ -7,8 +7,7 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 - [x] Setup Feature-Based Architecture: `app`, `features`, `shared`.
 - [x] Buat Landing Page untuk promosi project finance dashboard
 - [x] Buat app shell: sidebar, header, mobile navigation.
-- [ ] Implement theme: light/dark mode dan design token.
-- [ ] Buat utilities: currency, date, percentage, status formatter.
+- [x] Buat utilities: currency, date, percentage, status formatter.
 - [ ] Buat dummy data: workspace, accounts, categories, transactions, budgets.
 - [ ] Buat dashboard overview: metric cards, chart, recent transactions.
 - [ ] Buat transactions list: table, search, filter, pagination.
