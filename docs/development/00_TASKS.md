@@ -10,8 +10,8 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 - [x] Buat utilities: currency, date, percentage, status formatter.
 - [x] Buat dummy data: workspace, accounts, categories, transactions, budgets.
 - [x] Buat dashboard overview: metric cards, chart, recent transactions.
-- [ ] Buat transactions list: table, search, filter, pagination.
-- [ ] Buat transaction form: create, edit, detail, validation.
+- [x] Buat transactions list: table, search, filter, pagination.
+- [x] Buat transaction form: create, edit, detail, validation.
 
 ## P1 - Core Finance
 
