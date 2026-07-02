@@ -85,12 +85,12 @@ export function GlobalSearchButton() {
             <Button
                 type="button"
                 variant="outline"
-                className="hidden w-[18rem] justify-start text-muted-foreground md:inline-flex xl:w-[24rem]"
+                className="hidden h-9 w-[18rem] justify-start rounded-2xl border-border/70 bg-background/70 text-muted-foreground shadow-xs md:inline-flex xl:w-[24rem]"
                 onClick={() => setGlobalSearchOpen(true)}
             >
                 <SearchIcon aria-hidden="true" data-icon="inline-start" />
                 <span className="truncate">Search transactions, reports, accounts...</span>
-                <kbd className="ml-auto rounded-md border border-border bg-muted px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
+                <kbd className="ml-auto rounded-lg border border-border/70 bg-muted/70 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground">
                     Ctrl K
                 </kbd>
             </Button>
@@ -98,7 +98,7 @@ export function GlobalSearchButton() {
                 type="button"
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="rounded-2xl md:hidden"
                 aria-label="Open search"
                 onClick={() => setGlobalSearchOpen(true)}
             >
@@ -109,6 +109,7 @@ export function GlobalSearchButton() {
                 onOpenChange={setGlobalSearchOpen}
                 title="Global search"
                 description="Search workspace navigation and finance records."
+                className="rounded-3xl"
             >
                 <Command>
                     <CommandInput placeholder="Search transactions, reports, accounts..." />

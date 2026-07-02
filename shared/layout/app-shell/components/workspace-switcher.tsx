@@ -34,13 +34,16 @@ export function WorkspaceSwitcher() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="max-w-[15rem] justify-start px-2.5">
+                <Button
+                    variant="outline"
+                    className="max-w-[calc(100vw-10rem)] justify-start rounded-2xl border-border/70 bg-background/70 px-2.5 shadow-xs sm:max-w-[15rem]"
+                >
                     <Building2Icon aria-hidden="true" data-icon="inline-start" />
                     <span className="truncate">{activeWorkspace.name}</span>
                     <ChevronsUpDownIcon aria-hidden="true" data-icon="inline-end" className="ml-auto opacity-60" />
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="w-64">
+            <DropdownMenuContent align="start" className="w-64 rounded-3xl">
                 <DropdownMenuLabel>Workspace</DropdownMenuLabel>
                 <DropdownMenuGroup>
                     {workspaces.map((workspace) => (

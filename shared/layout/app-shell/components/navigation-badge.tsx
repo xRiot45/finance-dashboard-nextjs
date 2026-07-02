@@ -3,7 +3,7 @@ import type { NavigationItemBadge } from "@/shared/layout/app-shell/constants/na
 import { cn } from "@/shared/lib/utils"
 
 const badgeVariantClassNames: Record<NavigationItemBadge["variant"], string> = {
-    default: "bg-primary text-primary-foreground",
+    default: "bg-info-soft text-info-foreground",
     warning: "bg-warning-soft text-warning-foreground",
     destructive: "bg-destructive/10 text-destructive",
     muted: "bg-muted text-muted-foreground",
@@ -19,7 +19,7 @@ export function NavigationBadge({ badge, isCollapsed = false }: NavigationBadgeP
         return (
             <span
                 className={cn(
-                    "absolute top-1.5 right-1.5 size-1.5 rounded-full",
+                    "absolute top-1.5 right-1.5 size-1.5 rounded-full ring-2 ring-sidebar",
                     badgeVariantClassNames[badge.variant]
                 )}
             />
@@ -27,7 +27,9 @@ export function NavigationBadge({ badge, isCollapsed = false }: NavigationBadgeP
     }
 
     return (
-        <Badge className={cn("ml-auto h-4 px-1.5 text-[10px]", badgeVariantClassNames[badge.variant])}>
+        <Badge
+            className={cn("ml-auto h-4 border-transparent px-1.5 text-[10px]", badgeVariantClassNames[badge.variant])}
+        >
             {badge.value}
         </Badge>
     )

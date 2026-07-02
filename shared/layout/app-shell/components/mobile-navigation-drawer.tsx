@@ -10,7 +10,11 @@ export function MobileNavigationDrawer() {
 
     return (
         <Sheet open={isMobileNavigationOpen} onOpenChange={setMobileNavigationOpen}>
-            <SheetContent side="left" className="w-[20rem] max-w-[calc(100vw-2rem)] p-0" showCloseButton={false}>
+            <SheetContent
+                side="left"
+                className="h-dvh w-[20rem] max-w-[calc(100vw-2rem)] border-sidebar-border bg-sidebar p-0"
+                showCloseButton={false}
+            >
                 <SheetHeader className="sr-only">
                     <SheetTitle>Navigation</SheetTitle>
                     <SheetDescription>Open finance dashboard navigation.</SheetDescription>

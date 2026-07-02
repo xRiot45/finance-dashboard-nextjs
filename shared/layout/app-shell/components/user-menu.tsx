@@ -19,13 +19,13 @@ export function UserMenu() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" aria-label="Open user menu">
+                <Button type="button" variant="ghost" size="icon" aria-label="Open user menu" className="rounded-2xl">
                     <Avatar size="sm">
                         <AvatarFallback>AW</AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-60">
+            <DropdownMenuContent align="end" className="w-60 rounded-3xl">
                 <DropdownMenuLabel>
                     <span className="block truncate text-sm text-foreground">Anna Wijaya</span>
                     <span className="block truncate text-xs font-normal text-muted-foreground">anna@acme.test</span>

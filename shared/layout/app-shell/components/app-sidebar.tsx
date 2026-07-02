@@ -28,30 +28,34 @@ export function AppSidebar({ className, onNavigate, variant = "desktop" }: AppSi
         <TooltipProvider>
             <aside
                 className={cn(
-                    "flex h-full shrink-0 flex-col border-sidebar-border bg-sidebar text-sidebar-foreground",
-                    variant === "desktop" && "hidden border-r transition-[width] duration-200 lg:flex",
+                    "flex shrink-0 flex-col bg-sidebar text-sidebar-foreground",
+                    variant === "desktop" &&
+                        "fixed inset-y-0 left-0 hidden border-r border-sidebar-border/70 shadow-xs transition-[width] duration-200 ease-out lg:flex",
                     variant === "desktop" && (isCollapsed ? "w-16" : "w-64"),
-                    variant === "mobile" && "w-full",
+                    variant === "mobile" && "h-full w-full",
                     className
                 )}
             >
-                <div className={cn("flex h-14 items-center gap-2 px-3", isCollapsed && "justify-center px-2")}>
-                    <div className="flex size-8 shrink-0 items-center justify-center rounded-lg border border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground">
+                <div className={cn("flex h-16 items-center gap-3 px-3", isCollapsed && "justify-center px-2")}>
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-2xl border border-sidebar-border bg-sidebar-accent text-sidebar-accent-foreground shadow-xs">
                         <LandmarkIcon aria-hidden="true" />
                     </div>
                     {!isCollapsed && (
                         <div className="min-w-0">
                             <p className="truncate text-sm font-semibold">Finance OS</p>
-                            <p className="truncate text-xs text-muted-foreground">Workspace finance</p>
+                            <p className="truncate text-xs text-muted-foreground">Acme Studio</p>
                         </div>
                     )}
                 </div>
 
-                <nav className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto px-3 py-3" aria-label="Primary">
+                <nav
+                    className="scrollbar-thin flex min-h-0 flex-1 scrollbar-thumb-sidebar-border scrollbar-track-transparent flex-col gap-5 overflow-y-auto px-2.5 py-3 scrollbar-hover:scrollbar-thumb-muted-foreground"
+                    aria-label="Primary"
+                >
                     {navigationGroups.map((navigationGroup) => (
                         <div key={navigationGroup.id} className="flex flex-col gap-1">
                             {!isCollapsed && (
-                                <p className="px-2 pb-1 text-[11px] font-medium text-muted-foreground">
+                                <p className="px-2.5 pb-1 text-[11px] font-medium text-muted-foreground">
                                     {navigationGroup.title}
                                 </p>
                             )}
@@ -66,8 +70,9 @@ export function AppSidebar({ className, onNavigate, variant = "desktop" }: AppSi
                                         aria-label={isCollapsed ? navigationItem.title : undefined}
                                         onClick={onNavigate}
                                         className={cn(
-                                            "relative flex h-9 items-center gap-2 rounded-lg px-2 text-sm font-medium text-muted-foreground transition-colors outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-sidebar-ring/30",
-                                            isActive && "bg-sidebar-accent text-sidebar-accent-foreground",
+                                            "relative flex h-10 items-center gap-2.5 rounded-2xl px-2.5 text-sm font-medium text-muted-foreground transition-all outline-none hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-sidebar-ring/30",
+                                            isActive &&
+                                                "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs ring-1 ring-sidebar-border/70",
                                             isCollapsed && "justify-center px-0"
                                         )}
                                     >
@@ -95,7 +100,7 @@ export function AppSidebar({ className, onNavigate, variant = "desktop" }: AppSi
                 </nav>
 
                 {variant === "desktop" && (
-                    <div className="border-t border-sidebar-border p-3">
+                    <div className="border-t border-sidebar-border/70 p-3">
                         <Button
                             type="button"
                             variant="ghost"

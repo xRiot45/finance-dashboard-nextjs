@@ -39,14 +39,20 @@ export function NotificationButton() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button type="button" variant="ghost" size="icon" aria-label="Open notifications" className="relative">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Open notifications"
+                    className="relative rounded-2xl"
+                >
                     <BellIcon aria-hidden="true" />
-                    <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[9px] font-medium text-primary-foreground">
+                    <span className="absolute top-1 right-1 flex size-4 items-center justify-center rounded-full bg-info text-[9px] font-medium text-primary-foreground ring-2 ring-card">
                         {unreadCount}
                     </span>
                 </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-80">
+            <DropdownMenuContent align="end" className="w-80 rounded-3xl">
                 <DropdownMenuLabel className="flex items-center justify-between">
                     Notifications
                     <Badge variant="secondary">{unreadCount} unread</Badge>
