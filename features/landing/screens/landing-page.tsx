@@ -1,17 +1,29 @@
 import Link from "next/link"
 import {
     ArrowRight,
+    BadgeCheck,
     Bell,
+    BookOpenCheck,
+    BriefcaseBusiness,
+    ChartNoAxesCombined,
     CheckCircle2,
     CircleDollarSign,
+    Clock3,
+    DatabaseZap,
+    FileBarChart2,
     FileCheck2,
     Gauge,
     Landmark,
+    Layers3,
     LockKeyhole,
+    Network,
     ReceiptText,
+    Scale,
     ShieldCheck,
+    SlidersHorizontal,
     TrendingUp,
     UploadCloud,
+    UsersRound,
     WalletCards,
 } from "lucide-react"
 
@@ -19,6 +31,8 @@ import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Separator } from "@/shared/components/ui/separator"
+import { ThemeToggle } from "@/shared/components/theme-toggle"
+import { cn } from "@/shared/lib/utils"
 
 const financeMetrics = [
     {
@@ -41,6 +55,29 @@ const financeMetrics = [
     },
 ] as const
 
+const proofMetrics = [
+    {
+        value: "12+",
+        label: "Enterprise modules planned",
+        detail: "Dashboard, transactions, budgets, approvals, audit, reports, workspace, and settings.",
+    },
+    {
+        value: "4",
+        label: "Governance layers",
+        detail: "RBAC, approval workflow, audit trail, and import/export control.",
+    },
+    {
+        value: "100%",
+        label: "Design-system driven",
+        detail: "Colors, typography, spacing, iconography, and components follow the documented system.",
+    },
+    {
+        value: "1",
+        label: "Scalable architecture rule",
+        detail: "Features own their code. App Router stays focused on routing.",
+    },
+] as const
+
 const productModules = [
     {
         title: "Operational finance",
@@ -58,6 +95,105 @@ const productModules = [
         description: "Metric cards, tables, filters, charts, and empty states follow the same design language.",
         icon: Gauge,
     },
+] as const
+
+const featureShowcase = [
+    {
+        title: "Executive overview",
+        description: "High-signal metrics for total balance, income, expense, runway, budget risk, and cash flow.",
+        icon: ChartNoAxesCombined,
+        status: "Decision ready",
+    },
+    {
+        title: "Transaction control",
+        description: "Searchable records with category, account, status, attachment, approval, and audit context.",
+        icon: ReceiptText,
+        status: "Table first",
+    },
+    {
+        title: "Budget monitoring",
+        description: "Usage, thresholds, warning state, exceeded state, and owner visibility for every budget.",
+        icon: Gauge,
+        status: "Risk aware",
+    },
+    {
+        title: "Financial reports",
+        description: "Cash flow, income, expense, account, and budget reports with export-ready structure.",
+        icon: FileBarChart2,
+        status: "Export ready",
+    },
+    {
+        title: "Workspace roles",
+        description: "Member, manager, finance admin, auditor, and owner roles prepared for enterprise access.",
+        icon: UsersRound,
+        status: "RBAC ready",
+    },
+    {
+        title: "Import pipeline",
+        description: "CSV mapping, validation, queued jobs, warning summaries, and rollback-friendly review.",
+        icon: DatabaseZap,
+        status: "Ops friendly",
+    },
+] as const
+
+const workflowSteps = [
+    {
+        title: "Capture",
+        detail: "Record income, expenses, transfers, and adjustments with account and category context.",
+        icon: WalletCards,
+    },
+    {
+        title: "Review",
+        detail: "Route sensitive transactions to approval queues before they impact reporting confidence.",
+        icon: FileCheck2,
+    },
+    {
+        title: "Reconcile",
+        detail: "Compare budgets, actuals, account movement, and import results in consistent data surfaces.",
+        icon: Scale,
+    },
+    {
+        title: "Report",
+        detail: "Turn operational data into cash flow, budget, category, and audit-ready finance reports.",
+        icon: BookOpenCheck,
+    },
+] as const
+
+const governanceFeatures = [
+    {
+        title: "Role-based access",
+        detail: "Separate visibility and actions for owners, finance admins, managers, members, and auditors.",
+        icon: LockKeyhole,
+    },
+    {
+        title: "Approval guardrails",
+        detail: "Pending, approved, rejected, skipped, and needs-review states keep sensitive records governed.",
+        icon: BadgeCheck,
+    },
+    {
+        title: "Audit confidence",
+        detail: "Every important change can be traced by actor, timestamp, source, and affected entity.",
+        icon: ShieldCheck,
+    },
+    {
+        title: "Workspace scale",
+        detail: "Accounts, categories, budgets, imports, reports, and settings stay scoped to the right workspace.",
+        icon: Network,
+    },
+] as const
+
+const dashboardRows = [
+    ["TXN-2048", "SaaS invoice", "Approved", "+Rp18.4M"],
+    ["TXN-2049", "Payroll batch", "Pending", "-Rp42.0M"],
+    ["TXN-2050", "Marketing spend", "Review", "-Rp9.8M"],
+    ["TXN-2051", "Bank transfer", "Synced", "Rp24.0M"],
+] as const
+
+const categoryBreakdown = [
+    ["Payroll", "78%", "bg-warning"],
+    ["Operations", "56%", "bg-info"],
+    ["Software", "42%", "bg-success"],
+    ["Marketing", "31%", "bg-neutral"],
 ] as const
 
 const buildPrinciples = [
@@ -91,7 +227,11 @@ export function LandingPage() {
     return (
         <main className="min-h-svh bg-background text-foreground">
             <HeroSection />
+            <ProofSection />
             <ProductSection />
+            <DashboardShowcaseSection />
+            <WorkflowSection />
+            <GovernanceSection />
             <ArchitectureSection />
             <RoadmapSection />
             <FinalCallToAction />
@@ -117,6 +257,12 @@ function HeroSection() {
                     <Link href="#product" className="transition-colors hover:text-foreground">
                         Product
                     </Link>
+                    <Link href="#showcase" className="transition-colors hover:text-foreground">
+                        Showcase
+                    </Link>
+                    <Link href="#workflow" className="transition-colors hover:text-foreground">
+                        Workflow
+                    </Link>
                     <Link href="#architecture" className="transition-colors hover:text-foreground">
                         Architecture
                     </Link>
@@ -124,6 +270,7 @@ function HeroSection() {
                         Roadmap
                     </Link>
                 </nav>
+                <ThemeToggle />
             </header>
 
             <div className="relative z-10 mx-auto flex min-h-[calc(92svh-76px)] w-full max-w-7xl items-center px-4 pt-10 pb-12 sm:px-6 lg:px-8">
@@ -240,18 +387,36 @@ function DashboardBackdrop() {
     )
 }
 
+function ProofSection() {
+    return (
+        <section className="border-b bg-muted/30 px-4 py-10 sm:px-6 lg:px-8">
+            <div className="mx-auto grid max-w-7xl gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-2 lg:grid-cols-4">
+                {proofMetrics.map((metric) => (
+                    <div key={metric.label} className="bg-card p-5">
+                        <div className="font-mono text-3xl font-medium tracking-normal">{metric.value}</div>
+                        <div className="mt-2 text-sm font-medium">{metric.label}</div>
+                        <p className="mt-2 text-xs leading-5 text-muted-foreground">{metric.detail}</p>
+                    </div>
+                ))}
+            </div>
+        </section>
+    )
+}
+
 function ProductSection() {
     return (
         <section id="product" className="border-b px-4 py-20 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-7xl">
-                <div className="max-w-2xl">
-                    <Badge variant="secondary">Product signal</Badge>
-                    <h2 className="mt-4 text-3xl font-medium tracking-normal sm:text-4xl">
-                        Built around the daily rhythm of finance operations.
-                    </h2>
-                    <p className="mt-4 leading-7 text-muted-foreground">
+                <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+                    <div className="max-w-2xl">
+                        <Badge variant="secondary">Product signal</Badge>
+                        <h2 className="mt-4 text-3xl font-medium tracking-normal sm:text-4xl">
+                            Built around the daily rhythm of finance operations.
+                        </h2>
+                    </div>
+                    <p className="leading-7 text-muted-foreground">
                         The landing page promotes the same product promise the dashboard must deliver: clean records,
-                        fast scanning, and governance ready to scale with the team.
+                        fast scanning, governed actions, and finance surfaces that stay readable as data grows.
                     </p>
                 </div>
                 <div className="mt-10 grid gap-4 md:grid-cols-3">
@@ -266,6 +431,286 @@ function ProductSection() {
                             </CardHeader>
                         </Card>
                     ))}
+                </div>
+                <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {featureShowcase.map((feature) => (
+                        <Card key={feature.title} className="shadow-none">
+                            <CardHeader>
+                                <div className="flex items-start justify-between gap-4">
+                                    <div className="flex size-10 items-center justify-center rounded-lg border bg-background">
+                                        <feature.icon aria-hidden="true" />
+                                    </div>
+                                    <Badge variant="outline">{feature.status}</Badge>
+                                </div>
+                                <CardTitle>{feature.title}</CardTitle>
+                                <CardDescription>{feature.description}</CardDescription>
+                            </CardHeader>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+    )
+}
+
+function DashboardShowcaseSection() {
+    return (
+        <section id="showcase" className="border-b bg-muted/35 px-4 py-20 sm:px-6 lg:px-8">
+            <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+                <div>
+                    <Badge variant="secondary">Dashboard showcase</Badge>
+                    <h2 className="mt-4 text-3xl font-medium tracking-normal sm:text-4xl">
+                        A preview that feels like the real product.
+                    </h2>
+                    <p className="mt-4 leading-7 text-muted-foreground">
+                        Promote the finance dashboard with a product-like preview: metrics, budget pressure, transaction
+                        states, and reporting signals in one calm surface.
+                    </p>
+                    <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                        {[
+                            ["Cash visibility", "Income, expense, and net cash flow in one scan."],
+                            ["Budget control", "Thresholds and warning states before overspend happens."],
+                            ["Approval readiness", "Queues that show what needs finance review next."],
+                            ["Audit posture", "Every important change can be explained later."],
+                        ].map(([title, detail]) => (
+                            <div key={title} className="rounded-lg border bg-card p-4">
+                                <div className="text-sm font-medium">{title}</div>
+                                <div className="mt-1 text-xs leading-5 text-muted-foreground">{detail}</div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <Card className="overflow-hidden shadow-none">
+                    <CardHeader className="border-b">
+                        <div className="flex items-start justify-between gap-4">
+                            <div>
+                                <CardTitle>Finance command center</CardTitle>
+                                <CardDescription>Operating snapshot for Q3 planning.</CardDescription>
+                            </div>
+                            <Badge variant="outline">Live preview</Badge>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        <div className="grid gap-px bg-border sm:grid-cols-3">
+                            {[
+                                ["Total balance", "Rp428.7M", "+8.4%"],
+                                ["Monthly expense", "Rp116.2M", "3 risks"],
+                                ["Approval SLA", "1.8 days", "On track"],
+                            ].map(([label, value, detail]) => (
+                                <div key={label} className="bg-card p-5">
+                                    <div className="text-xs text-muted-foreground">{label}</div>
+                                    <div className="mt-2 font-mono text-2xl font-medium">{value}</div>
+                                    <div className="mt-2 text-xs text-muted-foreground">{detail}</div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="grid gap-px bg-border lg:grid-cols-[1.1fr_0.9fr]">
+                            <div className="bg-card p-5">
+                                <div className="mb-5 flex items-center justify-between gap-4">
+                                    <div>
+                                        <div className="text-sm font-medium">Cash flow trend</div>
+                                        <div className="mt-1 text-xs text-muted-foreground">
+                                            Income vs expense, last 6 months.
+                                        </div>
+                                    </div>
+                                    <Badge variant="secondary">Rp79.1M net</Badge>
+                                </div>
+                                <div className="flex h-48 items-end gap-3 border-b border-l px-4 pb-4">
+                                    {[48, 64, 52, 72, 58, 84].map((height, index) => (
+                                        <div
+                                            key={height}
+                                            className="flex flex-1 flex-col items-center justify-end gap-2"
+                                        >
+                                            <div className="flex w-full items-end gap-1">
+                                                <div
+                                                    className="h-20 flex-1 rounded-t-sm bg-chart-2"
+                                                    style={{ height: `${height}%` }}
+                                                />
+                                                <div
+                                                    className="h-16 flex-1 rounded-t-sm bg-chart-1"
+                                                    style={{ height: `${Math.max(height - 18, 24)}%` }}
+                                                />
+                                            </div>
+                                            <div className="font-mono text-[10px] text-muted-foreground">
+                                                M{index + 1}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="bg-card p-5">
+                                <div className="mb-5">
+                                    <div className="text-sm font-medium">Budget pressure</div>
+                                    <div className="mt-1 text-xs text-muted-foreground">Top categories by usage.</div>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    {categoryBreakdown.map(([label, value, fillClassName]) => (
+                                        <div key={label}>
+                                            <div className="mb-2 flex items-center justify-between text-xs">
+                                                <span>{label}</span>
+                                                <span className="font-mono text-muted-foreground">{value}</span>
+                                            </div>
+                                            <div className="h-2 overflow-hidden rounded-full bg-muted">
+                                                <div
+                                                    className={cn("h-full rounded-full", fillClassName)}
+                                                    style={{ width: value }}
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-card p-5">
+                            <div className="mb-4 flex items-center justify-between gap-4">
+                                <div>
+                                    <div className="text-sm font-medium">Recent finance activity</div>
+                                    <div className="mt-1 text-xs text-muted-foreground">
+                                        Status-first records for fast review.
+                                    </div>
+                                </div>
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href="#workflow">View flow</Link>
+                                </Button>
+                            </div>
+                            <div className="overflow-hidden rounded-lg border">
+                                {dashboardRows.map(([id, name, status, amount]) => (
+                                    <div
+                                        key={id}
+                                        className="grid grid-cols-[84px_1fr_86px] gap-3 border-b p-3 text-sm last:border-b-0 sm:grid-cols-[104px_1fr_110px_110px]"
+                                    >
+                                        <div className="font-mono text-xs text-muted-foreground">{id}</div>
+                                        <div className="truncate">{name}</div>
+                                        <Badge variant="outline">{status}</Badge>
+                                        <div className="hidden text-right font-mono sm:block">{amount}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+    )
+}
+
+function WorkflowSection() {
+    return (
+        <section id="workflow" className="border-b px-4 py-20 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
+                <div className="grid gap-8 lg:grid-cols-[0.75fr_1.25fr] lg:items-start">
+                    <div>
+                        <Badge variant="outline">Operating workflow</Badge>
+                        <h2 className="mt-4 text-3xl font-medium tracking-normal sm:text-4xl">
+                            Finance work, mapped from entry to report.
+                        </h2>
+                        <p className="mt-4 leading-7 text-muted-foreground">
+                            The product story is stronger when buyers can see how a transaction moves from daily input
+                            into review, reconciliation, and board-ready reporting.
+                        </p>
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
+                        {workflowSteps.map((step, index) => (
+                            <Card key={step.title} className="shadow-none">
+                                <CardHeader>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div className="flex size-10 items-center justify-center rounded-lg border bg-muted">
+                                            <step.icon aria-hidden="true" />
+                                        </div>
+                                        <span className="font-mono text-xs text-muted-foreground">
+                                            {String(index + 1).padStart(2, "0")}
+                                        </span>
+                                    </div>
+                                    <CardTitle>{step.title}</CardTitle>
+                                    <CardDescription>{step.detail}</CardDescription>
+                                </CardHeader>
+                            </Card>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        </section>
+    )
+}
+
+function GovernanceSection() {
+    return (
+        <section className="border-b bg-muted/35 px-4 py-20 sm:px-6 lg:px-8">
+            <div className="mx-auto max-w-7xl">
+                <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-end">
+                    <div>
+                        <Badge variant="secondary">Enterprise posture</Badge>
+                        <h2 className="mt-4 text-3xl font-medium tracking-normal sm:text-4xl">
+                            Built to look trustworthy before the first enterprise feature ships.
+                        </h2>
+                    </div>
+                    <p className="leading-7 text-muted-foreground">
+                        Enterprise-ready UI is not just more screens. It is clear permission language, visible review
+                        states, consistent status treatment, and predictable data boundaries.
+                    </p>
+                </div>
+                <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {governanceFeatures.map((feature) => (
+                        <Card key={feature.title} className="shadow-none">
+                            <CardHeader>
+                                <div className="mb-4 flex size-10 items-center justify-center rounded-lg border bg-background">
+                                    <feature.icon aria-hidden="true" />
+                                </div>
+                                <CardTitle>{feature.title}</CardTitle>
+                                <CardDescription>{feature.detail}</CardDescription>
+                            </CardHeader>
+                        </Card>
+                    ))}
+                </div>
+                <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                    <Card className="shadow-none">
+                        <CardHeader>
+                            <CardTitle>Permission-aware actions</CardTitle>
+                            <CardDescription>
+                                Every high-impact action gets a clear owner, state, and next step.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="grid gap-px overflow-hidden rounded-lg border bg-border sm:grid-cols-3">
+                                {[
+                                    ["Owner", "Workspace, billing, members"],
+                                    ["Finance admin", "Transactions, budgets, reports"],
+                                    ["Auditor", "Read-only logs and exports"],
+                                ].map(([role, scope]) => (
+                                    <div key={role} className="bg-card p-4">
+                                        <div className="text-sm font-medium">{role}</div>
+                                        <div className="mt-2 text-xs leading-5 text-muted-foreground">{scope}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <Card className="shadow-none">
+                        <CardHeader>
+                            <CardTitle>Operational quality signals</CardTitle>
+                            <CardDescription>
+                                Promotional proof points that map back to real product modules.
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="flex flex-col gap-3">
+                                {[
+                                    [Clock3, "Faster close review"],
+                                    [SlidersHorizontal, "Cleaner filtering"],
+                                    [BriefcaseBusiness, "Workspace-ready scaling"],
+                                    [Layers3, "Feature-owned codebase"],
+                                ].map(([Icon, label]) => (
+                                    <div
+                                        key={label as string}
+                                        className="flex items-center gap-3 rounded-lg border bg-background p-3 text-sm"
+                                    >
+                                        <Icon aria-hidden="true" />
+                                        <span>{label as string}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </section>
