@@ -3,41 +3,59 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #fcfcfc;
-  --foreground: #000000;
+  --background: #fafafa;
+  --foreground: #171717;
   --card: #ffffff;
-  --card-foreground: #000000;
-  --popover: #fcfcfc;
-  --popover-foreground: #000000;
-  --primary: #000000;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #171717;
   --primary-foreground: #ffffff;
-  --secondary: #ebebeb;
-  --secondary-foreground: #000000;
+  --secondary: #f2f2f2;
+  --secondary-foreground: #171717;
   --muted: #f5f5f5;
-  --muted-foreground: #525252;
-  --accent: #ebebeb;
-  --accent-foreground: #000000;
+  --muted-foreground: #4d4d4d;
+  --accent: #f2f2f2;
+  --accent-foreground: #171717;
   --destructive: #e54b4f;
   --destructive-foreground: #ffffff;
-  --border: #e4e4e4;
+  --border: #ebebeb;
   --input: #ebebeb;
-  --ring: #000000;
+  --ring: #171717;
+  --success: #0a7f3f;
+  --success-soft: #e7f7ee;
+  --success-foreground: #075f2f;
+  --warning: #f5a623;
+  --warning-soft: #fff4df;
+  --warning-foreground: #7a4700;
+  --danger: #e54b4f;
+  --danger-soft: #fdecec;
+  --danger-foreground: #9f1f23;
+  --info: #2d62ef;
+  --info-soft: #edf3ff;
+  --info-foreground: #1d46b8;
+  --neutral: #747474;
+  --neutral-soft: #f5f5f5;
+  --neutral-foreground: #525252;
+  --income: var(--success);
+  --expense: var(--danger);
+  --transfer: var(--info);
   --chart-1: #ffae04;
   --chart-2: #2d62ef;
   --chart-3: #a4a4a4;
-  --chart-4: #e4e4e4;
+  --chart-4: #ebebeb;
   --chart-5: #747474;
-  --sidebar: #fcfcfc;
-  --sidebar-foreground: #000000;
-  --sidebar-primary: #000000;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #171717;
+  --sidebar-primary: #171717;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #ebebeb;
-  --sidebar-accent-foreground: #000000;
+  --sidebar-accent: #f2f2f2;
+  --sidebar-accent-foreground: #171717;
   --sidebar-border: #ebebeb;
-  --sidebar-ring: #000000;
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Geist Mono, monospace;
+  --sidebar-ring: #171717;
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Merriweather", Georgia, serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 1px;
@@ -60,6 +78,12 @@
   --shadow-2xl: 0px 1px 2px 0px hsl(0 0% 0% / 0.45);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+  --layout-header-height: 3.5rem;
+  --layout-sidebar-width: 16rem;
+  --layout-page-padding: 1.5rem;
+  --layout-page-padding-mobile: 1rem;
+  --layout-section-gap: 1.5rem;
+  --layout-card-gap: 1rem;
 }
 
 .dark {
@@ -82,6 +106,24 @@
   --border: #242424;
   --input: #333333;
   --ring: #a4a4a4;
+  --success: #3ddc84;
+  --success-soft: #10291b;
+  --success-foreground: #b7f7cf;
+  --warning: #ffb84d;
+  --warning-soft: #33240d;
+  --warning-foreground: #ffe0a3;
+  --danger: #ff5b5b;
+  --danger-soft: #351314;
+  --danger-foreground: #ffc7c9;
+  --info: #5f8cff;
+  --info-soft: #101b3a;
+  --info-foreground: #c7d6ff;
+  --neutral: #a4a4a4;
+  --neutral-soft: #1d1d1d;
+  --neutral-foreground: #d4d4d4;
+  --income: var(--success);
+  --expense: var(--danger);
+  --transfer: var(--info);
   --chart-1: #ffae04;
   --chart-2: #2671f4;
   --chart-3: #747474;
@@ -95,9 +137,9 @@
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: #333333;
   --sidebar-ring: #a4a4a4;
-  --font-sans: Geist, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: Geist Mono, monospace;
+  --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Merriweather", Georgia, serif;
+  --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --radius: 0.5rem;
   --shadow-x: 0px;
   --shadow-y: 1px;
@@ -137,6 +179,24 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-foreground: var(--danger-foreground);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-foreground: var(--info-foreground);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-neutral-foreground: var(--neutral-foreground);
+  --color-income: var(--income);
+  --color-expense: var(--expense);
+  --color-transfer: var(--transfer);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -157,6 +217,35 @@
   --font-sans: "Geist", "Geist Fallback", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", ui-monospace, monospace;
   --font-serif: "Merriweather", Georgia, serif;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  --text-display: 2.5rem;
+  --text-display--line-height: 3rem;
+  --text-page-title: 2rem;
+  --text-page-title--line-height: 2.5rem;
+  --text-section-title: 1.25rem;
+  --text-section-title--line-height: 1.75rem;
+  --text-card-title: 1rem;
+  --text-card-title--line-height: 1.5rem;
+  --text-metric-value: 2rem;
+  --text-metric-value--line-height: 2.5rem;
+  --text-metric-label: 0.875rem;
+  --text-metric-label--line-height: 1.25rem;
+  --text-body: 0.875rem;
+  --text-body--line-height: 1.25rem;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1rem;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.125rem;
+
+  --spacing-header: var(--layout-header-height);
+  --spacing-sidebar: var(--layout-sidebar-width);
+  --spacing-page: var(--layout-page-padding);
+  --spacing-page-mobile: var(--layout-page-padding-mobile);
+  --spacing-section: var(--layout-section-gap);
+  --spacing-card: var(--layout-card-gap);
 
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -177,7 +266,32 @@
   * {
     @apply border-border outline-ring/50;
   }
+
+  html {
+    @apply bg-background font-sans antialiased;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-svh bg-background text-body text-foreground;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+    letter-spacing: var(--tracking-normal);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--info) 18%, transparent);
+    color: var(--foreground);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
