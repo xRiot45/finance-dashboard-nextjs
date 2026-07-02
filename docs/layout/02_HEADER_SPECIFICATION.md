@@ -38,7 +38,7 @@ Header merupakan bagian dari `features/app-shell`, bukan `app/`.
 Lokasi implementasi:
 
 ```txt
-features/app-shell/
+shared/layout/app-shell/
 ├── components/
 │   ├── app-header.tsx
 │   ├── mobile-menu-button.tsx
@@ -74,8 +74,8 @@ Penting untuk membedakan app header dan page header.
 
 | Area | Owner | Fungsi |
 |---|---|---|
-| App Header | `features/app-shell/components/app-header.tsx` | Global controls: workspace, search, notification, theme, user menu |
-| Page Header | `features/app-shell/components/page-header.tsx` atau feature screen | Page title, description, breadcrumb, primary page action |
+| App Header | `shared/layout/app-shell/components/app-header.tsx` | Global controls: workspace, search, notification, theme, user menu |
+| Page Header | `shared/layout/app-shell/components/page-header.tsx` atau feature screen | Page title, description, breadcrumb, primary page action |
 
 App header tidak boleh berisi:
 

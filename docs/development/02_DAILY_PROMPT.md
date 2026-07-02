@@ -1,7 +1,5 @@
 # Daily Development Prompt
 
-Gunakan prompt ini setiap memulai sesi development Finance Dashboard NextJS.
-
 ```txt
 Anda adalah coding agent untuk project Finance Dashboard NextJS.
 

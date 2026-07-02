@@ -30,7 +30,7 @@ Sidebar merupakan bagian dari `features/app-shell`, bukan `app/`.
 Lokasi implementasi:
 
 ```txt
-features/app-shell/
+shared/layout/app-shell/
 ├── components/
 │   ├── app-sidebar.tsx
 │   ├── sidebar-brand.tsx
@@ -244,7 +244,7 @@ Rules:
 Navigation config berada di:
 
 ```txt
-features/app-shell/constants/navigation-items.ts
+shared/layout/app-shell/constants/navigation-items.ts
 ```
 
 Type yang direkomendasikan:
@@ -506,7 +506,7 @@ Behavior:
 State owner:
 
 ```txt
-features/app-shell/stores/app-shell-store.ts
+shared/layout/app-shell/stores/app-shell-store.ts
 ```
 
 atau jika dipakai lintas shell:
@@ -551,7 +551,7 @@ Behavior:
 Component:
 
 ```txt
-features/app-shell/components/mobile-navigation-drawer.tsx
+shared/layout/app-shell/components/mobile-navigation-drawer.tsx
 ```
 
 Rules:
@@ -982,7 +982,7 @@ Keputusan sidebar untuk Finance Dashboard:
 - Sidebar adalah primary navigation desktop.
 - Sidebar berada di `features/app-shell`.
 - Primitive UI menggunakan `shared/components/ui/sidebar.tsx`.
-- Navigation config berada di `features/app-shell/constants/navigation-items.ts`.
+- Navigation config berada di `shared/layout/app-shell/constants/navigation-items.ts`.
 - Urutan item: Dashboard, Transactions, Accounts, Categories, Budgets, Reports, Approvals, Imports / Exports, Audit Logs, Notifications, Settings.
 - Sidebar desktop width default 256px.
 - Collapsed width 64px.

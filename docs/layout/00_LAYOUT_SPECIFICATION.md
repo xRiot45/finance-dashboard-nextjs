@@ -16,7 +16,7 @@ Layout specification dibuat agar:
 - Sidebar, header, content, toolbar, table, chart, dan form tersusun rapi.
 - Developer tidak membuat layout berbeda-beda per fitur.
 - UI tetap responsive di desktop, tablet, dan mobile.
-- Feature-Based Architecture tetap terjaga: `app/` hanya route layout tipis, `features/app-shell` menjadi pemilik shell.
+- Feature-Based Architecture tetap terjaga: `app/` hanya route layout tipis, `shared/layout/app-shell/` menjadi pemilik shell.
 - Design system seperti color, typography, spacing, iconography, dan component library digunakan secara konsisten.
 - Layout siap untuk fitur enterprise seperti workspace, RBAC, approval, audit log, import/export, dan reports.
 
@@ -94,7 +94,7 @@ Tidak boleh:
 Dashboard shell berada di:
 
 ```txt
-features/app-shell/
+shared/layout/app-shell/
 ├── components/
 │   ├── dashboard-shell.tsx
 │   ├── app-sidebar.tsx
@@ -116,7 +116,7 @@ features/app-shell/
 Route layout hanya mengimpor shell.
 
 ```tsx
-import { DashboardShell } from "@/features/app-shell"
+import { DashboardShell } from "@/shared/layout/app-shell/"
 
 export default function DashboardLayout({
   children,
@@ -624,7 +624,7 @@ Settings
 
 Rules:
 
-- Navigation config berada di `features/app-shell/constants/navigation-items.ts`.
+- Navigation config berada di `shared/layout/app-shell//constants/navigation-items.ts`.
 - Navigation permission-aware.
 - Active route harus jelas.
 - Label desktop harus terlihat.
@@ -1048,14 +1048,14 @@ Rules:
 Komponen layout yang disarankan:
 
 ```txt
-features/app-shell/components/dashboard-shell.tsx
-features/app-shell/components/app-sidebar.tsx
-features/app-shell/components/app-header.tsx
-features/app-shell/components/main-content.tsx
-features/app-shell/components/page-container.tsx
-features/app-shell/components/page-header.tsx
-features/app-shell/components/page-toolbar.tsx
-features/app-shell/components/mobile-navigation-drawer.tsx
+shared/layout/app-shell//components/dashboard-shell.tsx
+shared/layout/app-shell//components/app-sidebar.tsx
+shared/layout/app-shell//components/app-header.tsx
+shared/layout/app-shell//components/main-content.tsx
+shared/layout/app-shell//components/page-container.tsx
+shared/layout/app-shell//components/page-header.tsx
+shared/layout/app-shell//components/page-toolbar.tsx
+shared/layout/app-shell//components/mobile-navigation-drawer.tsx
 ```
 
 Feature page dapat memakai:
@@ -1194,7 +1194,7 @@ Gunakan checklist ini saat membuat halaman baru.
 | Checklist | Status |
 |---|---|
 | Menggunakan layout pattern sesuai page type | Required |
-| `app/` tetap tipis dan shell berada di `features/app-shell` | Required |
+| `app/` tetap tipis dan shell berada di `shared/layout/app-shell/` | Required |
 | Page header memiliki title dan action yang konsisten | Required |
 | Toolbar/filter berada di posisi standar | Required jika ada filter |
 | Content width sesuai jenis halaman | Required |
@@ -1216,7 +1216,7 @@ Keputusan layout utama untuk Finance Dashboard:
 
 - Layout menggunakan dashboard shell: sidebar, header, dan main content.
 - `app/` hanya route-level layout tipis.
-- Implementasi shell berada di `features/app-shell`.
+- Implementasi shell berada di `shared/layout/app-shell/`.
 - Desktop menggunakan persistent sidebar.
 - Mobile menggunakan sidebar drawer.
 - Page structure standar: page header, toolbar opsional, content, footer opsional.
