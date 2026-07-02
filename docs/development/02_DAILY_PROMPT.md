@@ -53,7 +53,6 @@ Flow coding:
    - `pnpm format`
    - `pnpm lint`
    - `pnpm typecheck`
-   - `pnpm build` jika menyentuh routing/build/config
 5. Jika membuat UI, cek responsive, dark mode, accessibility, dan visual consistency.
 6. Setelah task benar-benar selesai dan terverifikasi, update `docs/development/00_TASKS.md`:
    - ubah `- [ ] Nama task` menjadi `- [x] Nama task`
