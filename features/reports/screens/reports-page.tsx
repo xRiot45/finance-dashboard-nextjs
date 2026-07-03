@@ -1,11 +1,5 @@
-import { FeaturePlaceholderPage } from "@/shared/layout/app-shell/components/feature-placeholder-page"
+import { ReportsWorkbench } from "@/features/reports/components/reports-workbench"
 
 export function ReportsPage() {
-    return (
-        <FeaturePlaceholderPage
-            title="Reports"
-            description="Analyze income, expense, cash flow, and budget performance."
-            status="P1 module"
-        />
-    )
+    return <ReportsWorkbench />
 }
