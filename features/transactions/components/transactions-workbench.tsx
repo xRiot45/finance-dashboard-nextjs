@@ -194,7 +194,7 @@ export function TransactionsWorkbench() {
     }
 
     function saveTransaction() {
-        const nextErrors = validateTransactionForm(formValues)
+        const nextErrors = validateTransactionForm(formValues, activeAccounts, activeCategories)
 
         setFormErrors(nextErrors)
 
@@ -381,16 +381,24 @@ function mapTransactionToFormValues(transaction: Transaction): TransactionFormVa
     }
 }
 
-function validateTransactionForm(values: TransactionFormValues): TransactionFormErrors {
+function validateTransactionForm(
+    values: TransactionFormValues,
+    accounts: typeof mockAccounts,
+    categories: typeof mockCategories
+): TransactionFormErrors {
     const errors: TransactionFormErrors = {}
     const amount = parseAmount(values.amount)
     const requiresCategory = values.type === "income" || values.type === "expense"
+    const accountIds = new Set(accounts.map((account) => account.id))
+    const allowedCategoryIds = new Set(
+        categories.filter((category) => category.type === values.type).map((category) => category.id)
+    )
 
     if (!Number.isFinite(amount) || amount <= 0) {
         errors.amount = "Amount must be greater than 0."
     }
 
-    if (!values.accountId) {
+    if (!values.accountId || !accountIds.has(values.accountId)) {
         errors.accountId = "Select an account for this transaction."
     }
 
@@ -398,13 +406,15 @@ function validateTransactionForm(values: TransactionFormValues): TransactionForm
         errors.date = "Transaction date is required."
     }
 
-    if (requiresCategory && values.categoryId === "none") {
+    if (requiresCategory && (values.categoryId === "none" || !allowedCategoryIds.has(values.categoryId))) {
         errors.categoryId = "Select a category for income or expense transactions."
     }
 
     if (values.type === "transfer") {
         if (values.destinationAccountId === "none") {
             errors.destinationAccountId = "Select a destination account for this transfer."
+        } else if (!accountIds.has(values.destinationAccountId)) {
+            errors.destinationAccountId = "Select an active destination account for this transfer."
         } else if (values.destinationAccountId === values.accountId) {
             errors.destinationAccountId = "Destination account must be different from the source account."
         }

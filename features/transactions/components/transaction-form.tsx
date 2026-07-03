@@ -2,8 +2,8 @@
 
 import { PaperclipIcon, RotateCcwIcon, SaveIcon } from "lucide-react"
 
-import type { Account } from "@/features/accounts"
-import type { Category } from "@/features/categories"
+import { getAccountTypeOption, type Account } from "@/features/accounts"
+import { getCategoryTypeOption, type Category } from "@/features/categories"
 import {
     TRANSACTION_STATUS_OPTIONS,
     TRANSACTION_TYPE_OPTIONS,
@@ -29,7 +29,7 @@ import {
     SelectValue,
 } from "@/shared/components/ui/select"
 import { Textarea } from "@/shared/components/ui/textarea"
-import type { TransactionStatus, TransactionType } from "@/shared/utils"
+import { formatCurrency, formatTransactionType, type TransactionStatus, type TransactionType } from "@/shared/utils"
 
 export type TransactionFormMode = "create" | "edit"
 
@@ -73,9 +73,8 @@ export function TransactionForm({
 }: TransactionFormProps) {
     const isTransfer = values.type === "transfer"
     const requiresCategory = values.type === "income" || values.type === "expense"
-    const categoryOptions = categories.filter(
-        (category) => category.type === values.type || category.type === "transfer"
-    )
+    const categoryOptions = categories.filter((category) => category.type === values.type)
+    const destinationAccountOptions = accounts.filter((account) => account.id !== values.accountId)
 
     return (
         <form
@@ -180,7 +179,17 @@ export function TransactionForm({
                 <FieldGroup className="grid gap-4 md:grid-cols-2">
                     <Field className="gap-2" data-invalid={Boolean(errors.accountId)}>
                         <FieldLabel htmlFor="transaction-account">Source account</FieldLabel>
-                        <Select onValueChange={(value) => onChange({ accountId: value })} value={values.accountId}>
+                        <Select
+                            disabled={accounts.length === 0}
+                            onValueChange={(value) =>
+                                onChange({
+                                    accountId: value,
+                                    destinationAccountId:
+                                        values.destinationAccountId === value ? "none" : values.destinationAccountId,
+                                })
+                            }
+                            value={values.accountId}
+                        >
                             <SelectTrigger
                                 aria-invalid={Boolean(errors.accountId)}
                                 className="w-full"
@@ -191,14 +200,16 @@ export function TransactionForm({
                             <SelectContent>
                                 <SelectGroup>
                                     {accounts.map((account) => (
-                                        <SelectItem key={account.id} value={account.id}>
-                                            {account.name}
+                                        <SelectItem key={account.id} textValue={account.name} value={account.id}>
+                                            <AccountOption account={account} />
                                         </SelectItem>
                                     ))}
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
-                        <FieldDescription>Choose where this transaction affects the ledger.</FieldDescription>
+                        <FieldDescription>
+                            Only active accounts in this workspace are available for new transactions.
+                        </FieldDescription>
                         <FieldError>{errors.accountId}</FieldError>
                     </Field>
 
@@ -206,6 +217,7 @@ export function TransactionForm({
                         <Field className="gap-2" data-invalid={Boolean(errors.destinationAccountId)}>
                             <FieldLabel htmlFor="transaction-destination-account">Destination account</FieldLabel>
                             <Select
+                                disabled={destinationAccountOptions.length === 0}
                                 onValueChange={(value) => onChange({ destinationAccountId: value })}
                                 value={values.destinationAccountId}
                             >
@@ -219,14 +231,17 @@ export function TransactionForm({
                                 <SelectContent>
                                     <SelectGroup>
                                         <SelectItem value="none">Select destination</SelectItem>
-                                        {accounts.map((account) => (
-                                            <SelectItem key={account.id} value={account.id}>
-                                                {account.name}
+                                        {destinationAccountOptions.map((account) => (
+                                            <SelectItem key={account.id} textValue={account.name} value={account.id}>
+                                                <AccountOption account={account} />
                                             </SelectItem>
                                         ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
+                            <FieldDescription>
+                                Destination accounts exclude the selected source account.
+                            </FieldDescription>
                             <FieldError>{errors.destinationAccountId}</FieldError>
                         </Field>
                     ) : (
@@ -235,6 +250,7 @@ export function TransactionForm({
                                 Category{requiresCategory ? "" : " optional"}
                             </FieldLabel>
                             <Select
+                                disabled={requiresCategory && categoryOptions.length === 0}
                                 onValueChange={(value) => onChange({ categoryId: value })}
                                 value={values.categoryId}
                             >
@@ -249,13 +265,17 @@ export function TransactionForm({
                                     <SelectGroup>
                                         <SelectItem value="none">Uncategorized</SelectItem>
                                         {categoryOptions.map((category) => (
-                                            <SelectItem key={category.id} value={category.id}>
-                                                {category.name}
+                                            <SelectItem key={category.id} textValue={category.name} value={category.id}>
+                                                <CategoryOption category={category} />
                                             </SelectItem>
                                         ))}
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
+                            <FieldDescription>
+                                Categories are matched to the selected{" "}
+                                {formatTransactionType(values.type).toLowerCase()} type.
+                            </FieldDescription>
                             <FieldError>{errors.categoryId}</FieldError>
                         </Field>
                     )}
@@ -330,5 +350,29 @@ export function TransactionForm({
                 </Button>
             </div>
         </form>
+    )
+}
+
+function AccountOption({ account }: { account: Account }) {
+    const accountType = getAccountTypeOption(account.type)
+
+    return (
+        <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate">{account.name}</span>
+            <span className="truncate text-xs text-muted-foreground">
+                {accountType.label} - {formatCurrency(account.currentBalance, { currency: account.currency })}
+            </span>
+        </div>
+    )
+}
+
+function CategoryOption({ category }: { category: Category }) {
+    const categoryType = getCategoryTypeOption(category.type)
+
+    return (
+        <div className="flex min-w-0 flex-col gap-0.5">
+            <span className="truncate">{category.name}</span>
+            <span className="truncate text-xs text-muted-foreground">{categoryType.label}</span>
+        </div>
     )
 }
