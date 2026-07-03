@@ -3,12 +3,14 @@ import {
     BellIcon,
     ChartNoAxesCombinedIcon,
     CircleCheckBigIcon,
+    DownloadIcon,
     LayoutDashboardIcon,
     PiggyBankIcon,
     ReceiptTextIcon,
     ScrollTextIcon,
     SettingsIcon,
     TagsIcon,
+    UploadIcon,
     WalletCardsIcon,
     type LucideIcon,
 } from "lucide-react"
@@ -21,14 +23,15 @@ export type NavigationItemBadge = {
 export type NavigationItem = {
     id: string
     title: string
-    href: string
-    icon: LucideIcon
+    href?: string
+    icon?: LucideIcon
     permission?: string
     permissions?: string[]
     permissionMode?: "all" | "any"
     exact?: boolean
     activeHrefs?: string[]
     badge?: NavigationItemBadge
+    children?: NavigationItem[]
 }
 
 export type NavigationGroup = {
@@ -114,13 +117,41 @@ export const navigationGroups: NavigationGroup[] = [
                 },
             },
             {
-                id: "imports-exports",
-                title: "Imports / Exports",
-                href: "/imports",
+                id: "data-operations",
+                title: "Data Operations",
                 activeHrefs: ["/imports", "/exports"],
                 icon: ArrowUpDownIcon,
                 permissions: ["imports.manage", "exports.manage"],
                 permissionMode: "any",
+                children: [
+                    {
+                        id: "imports-exports",
+                        title: "Imports / Exports",
+                        href: "/imports",
+                        activeHrefs: ["/imports", "/exports"],
+                        icon: ArrowUpDownIcon,
+                        permissions: ["imports.manage", "exports.manage"],
+                        permissionMode: "any",
+                        children: [
+                            {
+                                id: "imports",
+                                title: "Imports",
+                                href: "/imports",
+                                icon: UploadIcon,
+                                permission: "imports.manage",
+                                exact: true,
+                            },
+                            {
+                                id: "exports",
+                                title: "Exports",
+                                href: "/exports",
+                                icon: DownloadIcon,
+                                permission: "exports.manage",
+                                exact: true,
+                            },
+                        ],
+                    },
+                ],
             },
             {
                 id: "audit-logs",

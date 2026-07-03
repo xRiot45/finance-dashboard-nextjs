@@ -1,13 +1,16 @@
 "use client"
 
+import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { ChevronsLeftIcon, ChevronsRightIcon, LandmarkIcon } from "lucide-react"
+import { ChevronRightIcon, ChevronsLeftIcon, ChevronsRightIcon, LandmarkIcon } from "lucide-react"
 
 import { Button } from "@/shared/components/ui/button"
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/shared/components/ui/collapsible"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/shared/components/ui/tooltip"
 import { useNavigationItems, isNavigationItemActive } from "@/shared/layout/app-shell/hooks/use-navigation-items"
 import { NavigationBadge } from "@/shared/layout/app-shell/components/navigation-badge"
+import type { NavigationItem } from "@/shared/layout/app-shell/constants/navigation-items"
 import { useAppShellStore } from "@/shared/layout/app-shell/stores/app-shell-store"
 import { cn } from "@/shared/lib/utils"
 
@@ -59,42 +62,19 @@ export function AppSidebar({ className, onNavigate, variant = "desktop" }: AppSi
                                     {navigationGroup.title}
                                 </p>
                             )}
-                            {navigationGroup.items.map((navigationItem) => {
-                                const Icon = navigationItem.icon
-                                const isActive = isNavigationItemActive(pathname, navigationItem)
-
-                                const item = (
-                                    <Link
-                                        href={navigationItem.href}
-                                        aria-current={isActive ? "page" : undefined}
-                                        aria-label={isCollapsed ? navigationItem.title : undefined}
-                                        onClick={onNavigate}
-                                        className={cn(
-                                            "relative flex h-10 items-center gap-2.5 rounded-2xl px-2.5 text-sm font-medium text-muted-foreground transition-all outline-none hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-sidebar-ring/30",
-                                            isActive &&
-                                                "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs ring-1 ring-sidebar-border/70",
-                                            isCollapsed && "justify-center px-0"
-                                        )}
-                                    >
-                                        <Icon aria-hidden="true" />
-                                        {!isCollapsed && <span className="truncate">{navigationItem.title}</span>}
-                                        {navigationItem.badge && (
-                                            <NavigationBadge badge={navigationItem.badge} isCollapsed={isCollapsed} />
-                                        )}
-                                    </Link>
-                                )
-
-                                if (!isCollapsed) {
-                                    return <div key={navigationItem.id}>{item}</div>
-                                }
-
-                                return (
-                                    <Tooltip key={navigationItem.id}>
-                                        <TooltipTrigger asChild>{item}</TooltipTrigger>
-                                        <TooltipContent side="right">{navigationItem.title}</TooltipContent>
-                                    </Tooltip>
-                                )
-                            })}
+                            <ul className="flex flex-col gap-1">
+                                {navigationGroup.items.map((navigationItem) => (
+                                    <SidebarNavigationItem
+                                        depth={0}
+                                        isCollapsed={isCollapsed}
+                                        item={navigationItem}
+                                        key={navigationItem.id}
+                                        onExpandSidebar={toggleSidebarCollapsed}
+                                        onNavigate={onNavigate}
+                                        pathname={pathname}
+                                    />
+                                ))}
+                            </ul>
                         </div>
                     ))}
                 </nav>
@@ -120,5 +100,198 @@ export function AppSidebar({ className, onNavigate, variant = "desktop" }: AppSi
                 )}
             </aside>
         </TooltipProvider>
+    )
+}
+
+type SidebarNavigationItemProps = {
+    depth: number
+    isCollapsed: boolean
+    item: NavigationItem
+    onExpandSidebar?: () => void
+    onNavigate?: () => void
+    pathname: string
+}
+
+function SidebarNavigationItem({
+    depth,
+    isCollapsed,
+    item,
+    onExpandSidebar,
+    onNavigate,
+    pathname,
+}: SidebarNavigationItemProps) {
+    const isActive = isNavigationItemActive(pathname, item)
+    const hasChildren = Boolean(item.children?.length)
+    const [isManuallyOpen, setIsManuallyOpen] = useState(false)
+    const isOpen = isActive || isManuallyOpen
+
+    if (isCollapsed && depth > 0) {
+        return null
+    }
+
+    if (isCollapsed) {
+        const itemControl = (
+            <SidebarNavigationControl
+                depth={depth}
+                isActive={isActive}
+                isCollapsed={isCollapsed}
+                item={item}
+                onClick={
+                    hasChildren && !item.href
+                        ? () => {
+                              setIsManuallyOpen(true)
+                              onExpandSidebar?.()
+                          }
+                        : undefined
+                }
+                onNavigate={onNavigate}
+            />
+        )
+
+        return (
+            <li>
+                <Tooltip>
+                    <TooltipTrigger asChild>{itemControl}</TooltipTrigger>
+                    <TooltipContent side="right">{item.title}</TooltipContent>
+                </Tooltip>
+            </li>
+        )
+    }
+
+    if (!hasChildren) {
+        return (
+            <li>
+                <SidebarNavigationControl
+                    depth={depth}
+                    isActive={isActive}
+                    isCollapsed={isCollapsed}
+                    item={item}
+                    onNavigate={onNavigate}
+                />
+            </li>
+        )
+    }
+
+    return (
+        <li>
+            <Collapsible open={isOpen} onOpenChange={setIsManuallyOpen}>
+                <CollapsibleTrigger asChild>
+                    <button
+                        aria-current={isActive ? "page" : undefined}
+                        aria-expanded={isOpen}
+                        className={getNavigationItemClassName({ depth, isActive, isCollapsed })}
+                        type="button"
+                    >
+                        <SidebarNavigationItemContent depth={depth} isCollapsed={isCollapsed} item={item} />
+                        {item.badge && <NavigationBadge badge={item.badge} />}
+                        <ChevronRightIcon
+                            aria-hidden="true"
+                            className={cn("ml-auto transition-transform", isOpen && "rotate-90")}
+                        />
+                    </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                    <ul className={getSubMenuClassName(depth)}>
+                        {item.children?.map((childItem) => (
+                            <SidebarNavigationItem
+                                depth={depth + 1}
+                                isCollapsed={isCollapsed}
+                                item={childItem}
+                                key={childItem.id}
+                                onExpandSidebar={onExpandSidebar}
+                                onNavigate={onNavigate}
+                                pathname={pathname}
+                            />
+                        ))}
+                    </ul>
+                </CollapsibleContent>
+            </Collapsible>
+        </li>
+    )
+}
+
+type SidebarNavigationControlProps = {
+    depth: number
+    isActive: boolean
+    isCollapsed: boolean
+    item: NavigationItem
+    onClick?: () => void
+    onNavigate?: () => void
+}
+
+function SidebarNavigationControl({
+    depth,
+    isActive,
+    isCollapsed,
+    item,
+    onClick,
+    onNavigate,
+}: SidebarNavigationControlProps) {
+    const className = getNavigationItemClassName({ depth, isActive, isCollapsed })
+
+    if (!item.href) {
+        return (
+            <button aria-current={isActive ? "page" : undefined} className={className} onClick={onClick} type="button">
+                <SidebarNavigationItemContent depth={depth} isCollapsed={isCollapsed} item={item} />
+                {item.badge && <NavigationBadge badge={item.badge} isCollapsed={isCollapsed} />}
+            </button>
+        )
+    }
+
+    return (
+        <Link
+            aria-current={isActive ? "page" : undefined}
+            aria-label={isCollapsed ? item.title : undefined}
+            className={className}
+            href={item.href}
+            onClick={onNavigate}
+        >
+            <SidebarNavigationItemContent depth={depth} isCollapsed={isCollapsed} item={item} />
+            {item.badge && <NavigationBadge badge={item.badge} isCollapsed={isCollapsed} />}
+        </Link>
+    )
+}
+
+type SidebarNavigationItemContentProps = {
+    depth: number
+    isCollapsed: boolean
+    item: NavigationItem
+}
+
+function SidebarNavigationItemContent({ depth, isCollapsed, item }: SidebarNavigationItemContentProps) {
+    const Icon = item.icon
+
+    return (
+        <>
+            {Icon ? <Icon aria-hidden="true" /> : null}
+            {!isCollapsed && <span className={cn("truncate", depth >= 2 && "text-xs")}>{item.title}</span>}
+        </>
+    )
+}
+
+function getNavigationItemClassName({
+    depth,
+    isActive,
+    isCollapsed,
+}: {
+    depth: number
+    isActive: boolean
+    isCollapsed: boolean
+}) {
+    return cn(
+        "relative flex w-full items-center gap-2.5 text-sm font-medium text-muted-foreground transition-all outline-none hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground focus-visible:ring-3 focus-visible:ring-sidebar-ring/30",
+        depth === 0 && "h-10 rounded-2xl px-2.5",
+        depth === 1 && "h-8 rounded-xl px-2.5",
+        depth >= 2 && "h-7 rounded-xl px-2.5 text-xs",
+        isActive && "bg-sidebar-accent text-sidebar-accent-foreground shadow-xs ring-1 ring-sidebar-border/70",
+        isCollapsed && "justify-center px-0"
+    )
+}
+
+function getSubMenuClassName(depth: number) {
+    return cn(
+        "mt-1 flex min-w-0 flex-col gap-1 border-l border-sidebar-border/70 py-1",
+        depth === 0 && "ml-4 pl-3",
+        depth > 0 && "ml-3 pl-3"
     )
 }
