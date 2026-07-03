@@ -100,13 +100,6 @@ Reference: [Link](https://example.com)
 - `LOW-MEDIUM` - Low-medium gains
 - `LOW` - Incremental improvements
 
-## Scripts
-
-- `pnpm build` - Compile rules into AGENTS.md
-- `pnpm validate` - Validate all rule files
-- `pnpm extract-tests` - Extract test cases for LLM evaluation
-- `pnpm dev` - Build and validate
-
 ## Contributing
 
 When adding or modifying rules:

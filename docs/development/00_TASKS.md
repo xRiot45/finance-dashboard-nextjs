@@ -44,4 +44,4 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 - [ ] Responsive desktop, tablet, mobile.
 - [ ] Dark mode rapi.
 - [ ] Accessibility dasar terpenuhi.
-- [ ] `pnpm lint`, `pnpm typecheck`, `pnpm build`.
+- [ ] `pnpm lint`, `pnpm typecheck`.

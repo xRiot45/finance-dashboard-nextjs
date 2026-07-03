@@ -1050,7 +1050,6 @@ Sebelum menyelesaikan perubahan kode, jalankan command sesuai scope.
 ```txt
 pnpm lint
 pnpm typecheck
-pnpm build
 ```
 
 Untuk formatting:

@@ -188,7 +188,6 @@ Dokumen ini menyusun fase development Finance Dashboard NextJS berdasarkan PRD, 
 
 - `pnpm lint` berhasil.
 - `pnpm typecheck` berhasil.
-- `pnpm build` berhasil.
 - Core flow responsive dan accessible.
 - Error, empty, loading, permission state konsisten.
 

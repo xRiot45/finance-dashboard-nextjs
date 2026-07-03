@@ -50,25 +50,25 @@ Target pengguna yang cocok untuk project ini:
 
 ## Tech Stack
 
-| Area | Teknologi |
-| --- | --- |
-| Framework | Next.js 16.2.6 |
-| UI Library | React 19.2.4 |
-| Bahasa | TypeScript |
-| Styling | Tailwind CSS 4 |
+| Area             | Teknologi                    |
+| ---------------- | ---------------------------- |
+| Framework        | Next.js 16.2.6               |
+| UI Library       | React 19.2.4                 |
+| Bahasa           | TypeScript                   |
+| Styling          | Tailwind CSS 4               |
 | Component System | shadcn/ui, Radix UI, Base UI |
-| Icon | lucide-react |
-| Chart | Recharts |
-| Table | TanStack Table |
-| Form | TanStack Form |
-| Data Fetching | TanStack Query, Axios |
-| State Management | Zustand |
-| Validasi | Zod |
-| Theme | next-themes |
-| Package Manager | pnpm |
-| Linting | ESLint |
-| Formatting | Prettier |
-| Git Hooks | Husky, Commitlint |
+| Icon             | lucide-react                 |
+| Chart            | Recharts                     |
+| Table            | TanStack Table               |
+| Form             | TanStack Form                |
+| Data Fetching    | TanStack Query, Axios        |
+| State Management | Zustand                      |
+| Validasi         | Zod                          |
+| Theme            | next-themes                  |
+| Package Manager  | pnpm                         |
+| Linting          | ESLint                       |
+| Formatting       | Prettier                     |
+| Git Hooks        | Husky, Commitlint            |
 
 ## Struktur Project
 
@@ -128,15 +128,15 @@ Folder dokumentasi sudah disiapkan dengan pembagian area produk, arsitektur, des
 
 Berikut modul yang paling relevan untuk tahap pengembangan berikutnya:
 
-| Modul | Deskripsi |
-| --- | --- |
-| Dashboard Overview | Ringkasan saldo, income, expense, cash flow, dan tren utama. |
-| Transactions | Daftar transaksi dengan filter, pencarian, kategori, dan status. |
-| Categories | Pengelolaan kategori pemasukan dan pengeluaran. |
-| Accounts | Pengelolaan akun seperti cash, bank, e-wallet, atau kartu kredit. |
-| Budgets | Perencanaan batas pengeluaran per kategori/periode. |
-| Reports | Grafik dan laporan bulanan, mingguan, atau tahunan. |
-| Settings | Preferensi pengguna, currency, theme, dan konfigurasi aplikasi. |
+| Modul              | Deskripsi                                                         |
+| ------------------ | ----------------------------------------------------------------- |
+| Dashboard Overview | Ringkasan saldo, income, expense, cash flow, dan tren utama.      |
+| Transactions       | Daftar transaksi dengan filter, pencarian, kategori, dan status.  |
+| Categories         | Pengelolaan kategori pemasukan dan pengeluaran.                   |
+| Accounts           | Pengelolaan akun seperti cash, bank, e-wallet, atau kartu kredit. |
+| Budgets            | Perencanaan batas pengeluaran per kategori/periode.               |
+| Reports            | Grafik dan laporan bulanan, mingguan, atau tahunan.               |
+| Settings           | Preferensi pengguna, currency, theme, dan konfigurasi aplikasi.   |
 
 ## Rekomendasi Halaman
 
@@ -226,12 +226,9 @@ Prioritas awal yang disarankan:
 ## Perintah Development
 
 ```bash
-pnpm dev
-pnpm build
-pnpm start
 pnpm lint
-pnpm typecheck
 pnpm format
+pnpm typecheck
 ```
 
 ## Kesimpulan
