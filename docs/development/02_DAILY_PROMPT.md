@@ -60,16 +60,4 @@ Output akhir sesi:
 - Ringkas task yang dikerjakan.
 - Sebutkan file yang diubah.
 - Sebutkan hasil validasi.
-- Sebutkan task berikutnya yang direkomendasikan.
 ```
-
-## Checklist Harian
-
-- [ ] Sudah cek `00_TASKS.md`.
-- [ ] Sudah pilih task prioritas teratas.
-- [ ] Sudah cek design system.
-- [ ] Sudah cek architecture terkait.
-- [ ] Sudah gunakan skill yang relevan.
-- [ ] Sudah implementasi sesuai coding standards.
-- [ ] Sudah verifikasi hasil.
-- [ ] Sudah update task menjadi `[x]` jika selesai.
