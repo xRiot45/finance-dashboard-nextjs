@@ -18,7 +18,7 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 - [x] Buat accounts module: list, create, edit, balance summary.
 - [x] Buat categories module: list, create, edit, archive.
 - [x] Hubungkan accounts/categories ke transaction form.
-- [ ] Buat budgets module: budget list, usage, warning/exceeded state.
+- [x] Buat budgets module: budget list, usage, warning/exceeded state.
 - [ ] Buat reports module: income, expense, cash flow, budget summary.
 - [ ] Pastikan semua core page punya loading, empty, error state.
 
