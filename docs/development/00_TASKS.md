@@ -24,7 +24,7 @@ Task disusun berdasarkan `03_FEATURE_MODULES.md`, dari MVP ke enterprise-ready.
 
 ## P2 - Enterprise Foundation
 
-- [ ] Buat auth pages: login, register, forgot password.
+- [x] Buat auth pages: login, register, forgot password.
 - [ ] Buat workspace module: switcher, members, workspace settings.
 - [ ] Buat RBAC dasar: role, permission-aware navigation/action.
 - [ ] Buat search/filter/saved view baseline.
