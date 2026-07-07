@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { AlertCircleIcon, DownloadIcon, PlusIcon } from "lucide-react"
+import { DownloadIcon, PiggyBankIcon, PlusIcon } from "lucide-react"
 
 import { BudgetDetail } from "@/features/budgets/components/budget-detail"
 import { BudgetFilters } from "@/features/budgets/components/budget-filters"
@@ -20,7 +20,9 @@ import {
     type BudgetTableRow,
 } from "@/features/budgets/utils/budget-view-models"
 import { mockCategories } from "@/features/categories"
-import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
+import { CoreEmptyState } from "@/shared/components/core-empty-state"
+import { CoreErrorState } from "@/shared/components/core-error-state"
+import { CoreLoadingState } from "@/shared/components/core-loading-state"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import {
@@ -47,7 +49,7 @@ type BudgetDataState = "ready" | "loading" | "error"
 
 export function BudgetsWorkbench() {
     const [budgets, setBudgets] = useState<Budget[]>(mockBudgets)
-    const [dataState] = useState<BudgetDataState>("ready")
+    const [dataState, setDataState] = useState<BudgetDataState>("ready")
     const [filters, setFilters] = useState<BudgetFilterState>(DEFAULT_FILTERS)
     const [page, setPage] = useState(1)
     const [selectedBudgetId, setSelectedBudgetId] = useState(mockBudgets[0]?.id ?? null)
@@ -75,6 +77,8 @@ export function BudgetsWorkbench() {
     )
     const summary = useMemo(() => summarizeBudgets(filteredRows), [filteredRows])
     const selectedBudget = budgetRows.find((budget) => budget.id === selectedBudgetId) ?? null
+    const hasNoBudgets = budgetRows.length === 0
+    const hasNoFilteredBudgets = !hasNoBudgets && filteredRows.length === 0
 
     function updateFilters(nextFilters: Partial<BudgetFilterState>) {
         setFilters((currentFilters) => ({ ...currentFilters, ...nextFilters }))
@@ -157,59 +161,113 @@ export function BudgetsWorkbench() {
 
             <BudgetRiskAlerts rows={budgetRows} />
 
-            <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <div>
-                        <CardTitle>Budget runway</CardTitle>
-                        <CardDescription>
-                            {formatNumber(filteredRows.length)} of {formatNumber(budgetRows.length)} budgets visible in
-                            the current view.
-                        </CardDescription>
-                    </div>
-                    <CardAction>
-                        <Tabs defaultValue="all" onValueChange={applyBudgetView}>
-                            <TabsList>
-                                <TabsTrigger value="all">All</TabsTrigger>
-                                <TabsTrigger value="attention">Near limit</TabsTrigger>
-                                <TabsTrigger value="exceeded">Over</TabsTrigger>
-                                <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </CardAction>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    {dataState === "error" ? (
-                        <Alert variant="destructive">
-                            <AlertCircleIcon aria-hidden="true" />
-                            <AlertTitle>Budgets could not be refreshed</AlertTitle>
-                            <AlertDescription>
-                                The local data state is showing an error pattern. Continue with the current list or try
-                                again after data is available.
-                            </AlertDescription>
-                        </Alert>
-                    ) : null}
-
-                    <BudgetFilters
-                        filters={filters}
-                        onFiltersChange={updateFilters}
-                        onReset={resetFilters}
-                        resultCount={filteredRows.length}
-                    />
-                    <BudgetsTable
-                        isLoading={dataState === "loading"}
-                        onArchiveBudget={archiveBudget}
-                        onEditBudget={editBudget}
-                        onViewBudget={viewBudget}
-                        rows={dataState === "error" ? [] : visibleRows}
-                    />
-                    <BudgetsPagination
-                        currentPage={safePage}
-                        onPageChange={setPage}
-                        pageCount={pageCount}
-                        totalCount={filteredRows.length}
-                    />
-                </CardContent>
-            </Card>
+            {dataState === "loading" ? (
+                <CoreLoadingState
+                    description="Loading budget periods, threshold status, category mapping, and runway calculations for the active workspace."
+                    icon={PiggyBankIcon}
+                    meta="Runway sync"
+                    title="Loading budget runway"
+                    variant="table"
+                />
+            ) : dataState === "error" ? (
+                <CoreErrorState
+                    description="Budgets could not be refreshed, so threshold decisions are paused before showing incomplete spend limits."
+                    icon={PiggyBankIcon}
+                    onRetry={() => setDataState("ready")}
+                    recoveryItems={[
+                        "Keep current period filters unchanged.",
+                        "Retry budget usage refresh.",
+                        "Review exceeded alerts after data returns.",
+                    ]}
+                    title="Budgets could not be refreshed"
+                />
+            ) : (
+                <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                    <CardHeader>
+                        <div>
+                            <CardTitle>Budget runway</CardTitle>
+                            <CardDescription>
+                                {formatNumber(filteredRows.length)} of {formatNumber(budgetRows.length)} budgets visible
+                                in the current view.
+                            </CardDescription>
+                        </div>
+                        <CardAction>
+                            <Tabs defaultValue="all" onValueChange={applyBudgetView}>
+                                <TabsList>
+                                    <TabsTrigger value="all">All</TabsTrigger>
+                                    <TabsTrigger value="attention">Near limit</TabsTrigger>
+                                    <TabsTrigger value="exceeded">Over</TabsTrigger>
+                                    <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </CardAction>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                        <BudgetFilters
+                            filters={filters}
+                            onFiltersChange={updateFilters}
+                            onReset={resetFilters}
+                            resultCount={filteredRows.length}
+                        />
+                        {hasNoBudgets || hasNoFilteredBudgets ? (
+                            <CoreEmptyState
+                                actions={
+                                    hasNoBudgets ? (
+                                        <Button onClick={() => setIsRoadmapDialogOpen(true)} type="button">
+                                            <PlusIcon aria-hidden="true" data-icon="inline-start" />
+                                            Add budget
+                                        </Button>
+                                    ) : null
+                                }
+                                description={
+                                    hasNoBudgets
+                                        ? "This workspace has no budget guardrails yet. Add budgets after categories exist so reports can compare spend against limits."
+                                        : "Budget records exist, but the current lifecycle, period, usage, or keyword filters hide every runway row."
+                                }
+                                icon={PiggyBankIcon}
+                                meta={hasNoBudgets ? "No guardrails" : "Filtered view empty"}
+                                secondaryAction={
+                                    hasNoFilteredBudgets
+                                        ? {
+                                              label: "Reset filters",
+                                              onClick: resetFilters,
+                                          }
+                                        : undefined
+                                }
+                                steps={
+                                    hasNoBudgets
+                                        ? [
+                                              "Choose a category to control.",
+                                              "Set the period and spend limit.",
+                                              "Review warning and exceeded states.",
+                                          ]
+                                        : [
+                                              "Switch lifecycle back to All.",
+                                              "Include every period.",
+                                              "Clear usage and keyword filters.",
+                                          ]
+                                }
+                                title={hasNoBudgets ? "No budgets yet" : "No matching budgets"}
+                            />
+                        ) : (
+                            <>
+                                <BudgetsTable
+                                    onArchiveBudget={archiveBudget}
+                                    onEditBudget={editBudget}
+                                    onViewBudget={viewBudget}
+                                    rows={visibleRows}
+                                />
+                                <BudgetsPagination
+                                    currentPage={safePage}
+                                    onPageChange={setPage}
+                                    pageCount={pageCount}
+                                    totalCount={filteredRows.length}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
                 <DialogContent className="scrollbar-thin max-h-[min(760px,calc(100vh-2rem))] scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto sm:max-w-2xl scrollbar-hover:scrollbar-thumb-muted-foreground">

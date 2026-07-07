@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { DownloadIcon, PlusIcon } from "lucide-react"
+import { DownloadIcon, PlusIcon, ReceiptTextIcon } from "lucide-react"
 
 import { mockAccounts } from "@/features/accounts"
 import { mockCategories } from "@/features/categories"
@@ -44,6 +44,9 @@ import {
 } from "@/shared/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger } from "@/shared/components/ui/tabs"
 import { formatNumber } from "@/shared/utils"
+import { CoreEmptyState } from "@/shared/components/core-empty-state"
+import { CoreErrorState } from "@/shared/components/core-error-state"
+import { CoreLoadingState } from "@/shared/components/core-loading-state"
 
 const ACTIVE_WORKSPACE_ID = "wks_acme"
 const DEFAULT_TRANSACTION_DATE = "2026-07-02"
@@ -72,8 +75,11 @@ const DEFAULT_FORM_VALUES: TransactionFormValues = {
     type: "expense",
 }
 
+type TransactionDataState = "ready" | "loading" | "error"
+
 export function TransactionsWorkbench() {
     const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions)
+    const [dataState, setDataState] = useState<TransactionDataState>("ready")
     const [filters, setFilters] = useState<TransactionFilterState>(DEFAULT_FILTERS)
     const [page, setPage] = useState(1)
     const [selectedIds, setSelectedIds] = useState<string[]>([])
@@ -112,6 +118,8 @@ export function TransactionsWorkbench() {
     )
     const summary = useMemo(() => summarizeTransactions(filteredRows), [filteredRows])
     const selectedTransaction = transactionRows.find((transaction) => transaction.id === selectedTransactionId) ?? null
+    const hasNoTransactions = transactionRows.length === 0
+    const hasNoFilteredTransactions = !hasNoTransactions && filteredRows.length === 0
     const allVisibleSelected =
         visibleRows.length > 0 && visibleRows.every((transaction) => selectedIds.includes(transaction.id))
     const someVisibleSelected =
@@ -252,56 +260,122 @@ export function TransactionsWorkbench() {
 
             <TransactionSummaryCards summary={summary} />
 
-            <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <div>
-                        <CardTitle>Transaction ledger</CardTitle>
-                        <CardDescription>
-                            {formatNumber(filteredRows.length)} of {formatNumber(transactionRows.length)} transactions
-                            visible in the current view.
-                        </CardDescription>
-                    </div>
-                    <CardAction>
-                        <Tabs defaultValue="all" onValueChange={applySavedView}>
-                            <TabsList>
-                                <TabsTrigger value="all">All</TabsTrigger>
-                                <TabsTrigger value="needs-review">Review</TabsTrigger>
-                                <TabsTrigger value="drafts">Drafts</TabsTrigger>
-                                <TabsTrigger value="expenses">Expenses</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </CardAction>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    <TransactionFilters
-                        accounts={activeAccounts}
-                        filters={filters}
-                        onFiltersChange={updateFilters}
-                        onReset={resetFilters}
-                        resultCount={filteredRows.length}
-                    />
-                    <TransactionBulkActions
-                        onClearSelection={() => setSelectedIds([])}
-                        selectedCount={selectedIds.length}
-                    />
-                    <TransactionsTable
-                        allVisibleSelected={allVisibleSelected}
-                        onEditTransaction={startEditTransaction}
-                        onSelectAllVisible={toggleVisibleSelection}
-                        onSelectedChange={toggleTransactionSelection}
-                        onViewTransaction={viewTransaction}
-                        rows={visibleRows}
-                        selectedIds={selectedIds}
-                        someVisibleSelected={someVisibleSelected}
-                    />
-                    <TransactionsPagination
-                        currentPage={safePage}
-                        onPageChange={setPage}
-                        pageCount={pageCount}
-                        totalCount={filteredRows.length}
-                    />
-                </CardContent>
-            </Card>
+            {dataState === "loading" ? (
+                <CoreLoadingState
+                    description="Loading ledger rows, saved views, bulk actions, and account filters for the active workspace."
+                    icon={ReceiptTextIcon}
+                    meta="Ledger sync"
+                    title="Loading transaction ledger"
+                    variant="table"
+                />
+            ) : dataState === "error" ? (
+                <CoreErrorState
+                    description="Transactions could not be refreshed, so the ledger is paused before showing stale or partial movement."
+                    icon={ReceiptTextIcon}
+                    onRetry={() => setDataState("ready")}
+                    recoveryItems={[
+                        "Keep the current filter set in place.",
+                        "Retry the ledger refresh.",
+                        "Create a draft only after the source is available.",
+                    ]}
+                    title="Transaction ledger could not be refreshed"
+                />
+            ) : (
+                <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                    <CardHeader>
+                        <div>
+                            <CardTitle>Transaction ledger</CardTitle>
+                            <CardDescription>
+                                {formatNumber(filteredRows.length)} of {formatNumber(transactionRows.length)}{" "}
+                                transactions visible in the current view.
+                            </CardDescription>
+                        </div>
+                        <CardAction>
+                            <Tabs defaultValue="all" onValueChange={applySavedView}>
+                                <TabsList>
+                                    <TabsTrigger value="all">All</TabsTrigger>
+                                    <TabsTrigger value="needs-review">Review</TabsTrigger>
+                                    <TabsTrigger value="drafts">Drafts</TabsTrigger>
+                                    <TabsTrigger value="expenses">Expenses</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </CardAction>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                        <TransactionFilters
+                            accounts={activeAccounts}
+                            filters={filters}
+                            onFiltersChange={updateFilters}
+                            onReset={resetFilters}
+                            resultCount={filteredRows.length}
+                        />
+                        {hasNoTransactions || hasNoFilteredTransactions ? (
+                            <CoreEmptyState
+                                actions={
+                                    hasNoTransactions ? (
+                                        <Button onClick={startCreateTransaction} type="button">
+                                            <PlusIcon aria-hidden="true" data-icon="inline-start" />
+                                            Add transaction
+                                        </Button>
+                                    ) : null
+                                }
+                                description={
+                                    hasNoTransactions
+                                        ? "This workspace has no transaction records yet. Start with a draft, then use accounts and categories to keep it audit-ready."
+                                        : "The ledger has records, but none match the current account, status, type, keyword, or date filters."
+                                }
+                                icon={ReceiptTextIcon}
+                                meta={hasNoTransactions ? "Workspace ledger empty" : "Filtered view empty"}
+                                secondaryAction={
+                                    hasNoFilteredTransactions
+                                        ? {
+                                              label: "Reset filters",
+                                              onClick: resetFilters,
+                                          }
+                                        : undefined
+                                }
+                                steps={
+                                    hasNoTransactions
+                                        ? [
+                                              "Create a draft transaction.",
+                                              "Attach the right account and category.",
+                                              "Review it from the ledger detail panel.",
+                                          ]
+                                        : [
+                                              "Clear the keyword search.",
+                                              "Widen the date range.",
+                                              "Switch saved view back to All.",
+                                          ]
+                                }
+                                title={hasNoTransactions ? "No transactions yet" : "No matching transactions"}
+                            />
+                        ) : (
+                            <>
+                                <TransactionBulkActions
+                                    onClearSelection={() => setSelectedIds([])}
+                                    selectedCount={selectedIds.length}
+                                />
+                                <TransactionsTable
+                                    allVisibleSelected={allVisibleSelected}
+                                    onEditTransaction={startEditTransaction}
+                                    onSelectAllVisible={toggleVisibleSelection}
+                                    onSelectedChange={toggleTransactionSelection}
+                                    onViewTransaction={viewTransaction}
+                                    rows={visibleRows}
+                                    selectedIds={selectedIds}
+                                    someVisibleSelected={someVisibleSelected}
+                                />
+                                <TransactionsPagination
+                                    currentPage={safePage}
+                                    onPageChange={setPage}
+                                    pageCount={pageCount}
+                                    totalCount={filteredRows.length}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
                 <DialogContent className="scrollbar-thin max-h-[min(760px,calc(100vh-2rem))] scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto sm:max-w-2xl scrollbar-hover:scrollbar-thumb-muted-foreground">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { AlertCircleIcon, DownloadIcon, PlusIcon } from "lucide-react"
+import { DownloadIcon, PlusIcon, WalletCardsIcon } from "lucide-react"
 
 import {
     AccountForm,
@@ -24,7 +24,9 @@ import {
     type AccountTableRow,
 } from "@/features/accounts/utils/account-view-models"
 import { TransactionsPagination } from "@/features/transactions/components/transactions-pagination"
-import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
+import { CoreEmptyState } from "@/shared/components/core-empty-state"
+import { CoreErrorState } from "@/shared/components/core-error-state"
+import { CoreLoadingState } from "@/shared/components/core-loading-state"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import {
@@ -87,6 +89,8 @@ export function AccountsWorkbench() {
     )
     const summary = useMemo(() => summarizeAccounts(filteredRows), [filteredRows])
     const selectedAccount = accountRows.find((account) => account.id === selectedAccountId) ?? null
+    const hasNoAccounts = accountRows.length === 0
+    const hasNoFilteredAccounts = !hasNoAccounts && filteredRows.length === 0
 
     function updateFilters(nextFilters: Partial<AccountFilterState>) {
         setFilters((currentFilters) => ({ ...currentFilters, ...nextFilters }))
@@ -201,58 +205,112 @@ export function AccountsWorkbench() {
 
             <AccountSummaryCards summary={summary} />
 
-            <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <div>
-                        <CardTitle>Account sources</CardTitle>
-                        <CardDescription>
-                            {formatNumber(filteredRows.length)} of {formatNumber(accountRows.length)} accounts visible
-                            in the current view.
-                        </CardDescription>
-                    </div>
-                    <CardAction>
-                        <Tabs defaultValue="all" onValueChange={applyVisibilityView}>
-                            <TabsList>
-                                <TabsTrigger value="all">All</TabsTrigger>
-                                <TabsTrigger value="active">Active</TabsTrigger>
-                                <TabsTrigger value="archived">Archived</TabsTrigger>
-                            </TabsList>
-                        </Tabs>
-                    </CardAction>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    {dataState === "error" ? (
-                        <Alert variant="destructive">
-                            <AlertCircleIcon aria-hidden="true" />
-                            <AlertTitle>Accounts could not be refreshed</AlertTitle>
-                            <AlertDescription>
-                                The local data state is showing an error pattern. Try again or continue editing the
-                                current draft list.
-                            </AlertDescription>
-                        </Alert>
-                    ) : null}
-
-                    <AccountFilters
-                        filters={filters}
-                        onFiltersChange={updateFilters}
-                        onReset={resetFilters}
-                        resultCount={filteredRows.length}
-                    />
-                    <AccountsTable
-                        isLoading={dataState === "loading"}
-                        onArchiveAccount={archiveAccount}
-                        onEditAccount={startEditAccount}
-                        onViewAccount={viewAccount}
-                        rows={dataState === "error" ? [] : visibleRows}
-                    />
-                    <TransactionsPagination
-                        currentPage={safePage}
-                        onPageChange={setPage}
-                        pageCount={pageCount}
-                        totalCount={filteredRows.length}
-                    />
-                </CardContent>
-            </Card>
+            {dataState === "loading" ? (
+                <CoreLoadingState
+                    description="Loading balances, visibility filters, institutions, and account usage weight for the workspace."
+                    icon={WalletCardsIcon}
+                    meta="Balance sync"
+                    title="Loading account sources"
+                    variant="table"
+                />
+            ) : dataState === "error" ? (
+                <CoreErrorState
+                    description="Accounts could not be refreshed, so balance summaries and source rows are paused until the workspace data is ready."
+                    icon={WalletCardsIcon}
+                    onRetry={() => setDataState("ready")}
+                    recoveryItems={[
+                        "Keep the current account filters.",
+                        "Retry the account refresh.",
+                        "Confirm the workspace still has access to balance sources.",
+                    ]}
+                    title="Accounts could not be refreshed"
+                />
+            ) : (
+                <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                    <CardHeader>
+                        <div>
+                            <CardTitle>Account sources</CardTitle>
+                            <CardDescription>
+                                {formatNumber(filteredRows.length)} of {formatNumber(accountRows.length)} accounts
+                                visible in the current view.
+                            </CardDescription>
+                        </div>
+                        <CardAction>
+                            <Tabs defaultValue="all" onValueChange={applyVisibilityView}>
+                                <TabsList>
+                                    <TabsTrigger value="all">All</TabsTrigger>
+                                    <TabsTrigger value="active">Active</TabsTrigger>
+                                    <TabsTrigger value="archived">Archived</TabsTrigger>
+                                </TabsList>
+                            </Tabs>
+                        </CardAction>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                        <AccountFilters
+                            filters={filters}
+                            onFiltersChange={updateFilters}
+                            onReset={resetFilters}
+                            resultCount={filteredRows.length}
+                        />
+                        {hasNoAccounts || hasNoFilteredAccounts ? (
+                            <CoreEmptyState
+                                actions={
+                                    hasNoAccounts ? (
+                                        <Button onClick={startCreateAccount} type="button">
+                                            <PlusIcon aria-hidden="true" data-icon="inline-start" />
+                                            Add account
+                                        </Button>
+                                    ) : null
+                                }
+                                description={
+                                    hasNoAccounts
+                                        ? "This workspace has no account sources yet. Add bank, cash, wallet, card, or investment accounts before classifying transactions."
+                                        : "Account data exists, but none match the active search, type, or status filters."
+                                }
+                                icon={WalletCardsIcon}
+                                meta={hasNoAccounts ? "No sources" : "Filtered view empty"}
+                                secondaryAction={
+                                    hasNoFilteredAccounts
+                                        ? {
+                                              label: "Reset filters",
+                                              onClick: resetFilters,
+                                          }
+                                        : undefined
+                                }
+                                steps={
+                                    hasNoAccounts
+                                        ? [
+                                              "Add the primary operating account.",
+                                              "Set opening and current balances.",
+                                              "Use accounts in transactions and reports.",
+                                          ]
+                                        : [
+                                              "Clear the account search.",
+                                              "Switch type back to All.",
+                                              "Include archived accounts if needed.",
+                                          ]
+                                }
+                                title={hasNoAccounts ? "No accounts yet" : "No matching accounts"}
+                            />
+                        ) : (
+                            <>
+                                <AccountsTable
+                                    onArchiveAccount={archiveAccount}
+                                    onEditAccount={startEditAccount}
+                                    onViewAccount={viewAccount}
+                                    rows={visibleRows}
+                                />
+                                <TransactionsPagination
+                                    currentPage={safePage}
+                                    onPageChange={setPage}
+                                    pageCount={pageCount}
+                                    totalCount={filteredRows.length}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
                 <DialogContent className="scrollbar-thin max-h-[min(760px,calc(100vh-2rem))] scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto sm:max-w-2xl scrollbar-hover:scrollbar-thumb-muted-foreground">

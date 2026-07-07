@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { AlertCircleIcon, DownloadIcon, PlusIcon } from "lucide-react"
+import { DownloadIcon, PlusIcon, TagsIcon } from "lucide-react"
 
 import {
     CategoryForm,
@@ -31,7 +31,9 @@ import {
     type CategoryTableRow,
 } from "@/features/categories/utils/category-view-models"
 import { mockTransactions } from "@/features/transactions"
-import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
+import { CoreEmptyState } from "@/shared/components/core-empty-state"
+import { CoreErrorState } from "@/shared/components/core-error-state"
+import { CoreLoadingState } from "@/shared/components/core-loading-state"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import {
@@ -98,6 +100,8 @@ export function CategoriesWorkbench() {
     )
     const summary = useMemo(() => summarizeCategories(filteredRows), [filteredRows])
     const selectedCategory = categoryRows.find((category) => category.id === selectedCategoryId) ?? null
+    const hasNoCategories = categoryRows.length === 0
+    const hasNoFilteredCategories = !hasNoCategories && filteredRows.length === 0
 
     function updateFilters(nextFilters: Partial<CategoryFilterState>) {
         setFilters((currentFilters) => ({ ...currentFilters, ...nextFilters }))
@@ -209,49 +213,103 @@ export function CategoriesWorkbench() {
 
             <CategoryUsageBoard groups={typeGroups} onViewCategory={viewCategory} />
 
-            <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <div>
-                        <CardTitle>Category registry</CardTitle>
-                        <CardDescription>
-                            {formatNumber(filteredRows.length)} of {formatNumber(categoryRows.length)} categories
-                            visible in the current view.
-                        </CardDescription>
-                    </div>
-                </CardHeader>
-                <CardContent className="flex flex-col gap-4">
-                    {dataState === "error" ? (
-                        <Alert variant="destructive">
-                            <AlertCircleIcon aria-hidden="true" />
-                            <AlertTitle>Categories could not be refreshed</AlertTitle>
-                            <AlertDescription>
-                                The local data state is showing an error pattern. Try again or continue editing the
-                                current category draft list.
-                            </AlertDescription>
-                        </Alert>
-                    ) : null}
-
-                    <CategoryFilters
-                        filters={filters}
-                        onFiltersChange={updateFilters}
-                        onReset={resetFilters}
-                        resultCount={filteredRows.length}
-                    />
-                    <CategoriesTable
-                        isLoading={dataState === "loading"}
-                        onArchiveCategory={archiveCategory}
-                        onEditCategory={startEditCategory}
-                        onViewCategory={viewCategory}
-                        rows={dataState === "error" ? [] : visibleRows}
-                    />
-                    <CategoriesPagination
-                        currentPage={safePage}
-                        onPageChange={setPage}
-                        pageCount={pageCount}
-                        totalCount={filteredRows.length}
-                    />
-                </CardContent>
-            </Card>
+            {dataState === "loading" ? (
+                <CoreLoadingState
+                    description="Loading taxonomy records, usage weights, hierarchy, and category filters for this workspace."
+                    icon={TagsIcon}
+                    meta="Taxonomy sync"
+                    title="Loading category registry"
+                    variant="table"
+                />
+            ) : dataState === "error" ? (
+                <CoreErrorState
+                    description="Categories could not be refreshed, so taxonomy usage and editable rows are paused until the source is available."
+                    icon={TagsIcon}
+                    onRetry={() => setDataState("ready")}
+                    recoveryItems={[
+                        "Keep the current taxonomy filters.",
+                        "Retry the category refresh.",
+                        "Avoid archiving categories until usage data returns.",
+                    ]}
+                    title="Categories could not be refreshed"
+                />
+            ) : (
+                <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                    <CardHeader>
+                        <div>
+                            <CardTitle>Category registry</CardTitle>
+                            <CardDescription>
+                                {formatNumber(filteredRows.length)} of {formatNumber(categoryRows.length)} categories
+                                visible in the current view.
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                        <CategoryFilters
+                            filters={filters}
+                            onFiltersChange={updateFilters}
+                            onReset={resetFilters}
+                            resultCount={filteredRows.length}
+                        />
+                        {hasNoCategories || hasNoFilteredCategories ? (
+                            <CoreEmptyState
+                                actions={
+                                    hasNoCategories ? (
+                                        <Button onClick={startCreateCategory} type="button">
+                                            <PlusIcon aria-hidden="true" data-icon="inline-start" />
+                                            Add category
+                                        </Button>
+                                    ) : null
+                                }
+                                description={
+                                    hasNoCategories
+                                        ? "This workspace has no finance taxonomy yet. Add income and expense categories before budgets and reports depend on them."
+                                        : "Category records exist, but the current keyword, type, or status filters hide every row."
+                                }
+                                icon={TagsIcon}
+                                meta={hasNoCategories ? "Taxonomy empty" : "Filtered view empty"}
+                                secondaryAction={
+                                    hasNoFilteredCategories
+                                        ? {
+                                              label: "Reset filters",
+                                              onClick: resetFilters,
+                                          }
+                                        : undefined
+                                }
+                                steps={
+                                    hasNoCategories
+                                        ? [
+                                              "Create core income and expense groups.",
+                                              "Add parent relationships only when useful.",
+                                              "Use categories in transactions and budgets.",
+                                          ]
+                                        : [
+                                              "Clear the category search.",
+                                              "Switch type back to All.",
+                                              "Include archived categories if needed.",
+                                          ]
+                                }
+                                title={hasNoCategories ? "No categories yet" : "No matching categories"}
+                            />
+                        ) : (
+                            <>
+                                <CategoriesTable
+                                    onArchiveCategory={archiveCategory}
+                                    onEditCategory={startEditCategory}
+                                    onViewCategory={viewCategory}
+                                    rows={visibleRows}
+                                />
+                                <CategoriesPagination
+                                    currentPage={safePage}
+                                    onPageChange={setPage}
+                                    pageCount={pageCount}
+                                    totalCount={filteredRows.length}
+                                />
+                            </>
+                        )}
+                    </CardContent>
+                </Card>
+            )}
 
             <Dialog open={isDetailDialogOpen} onOpenChange={setIsDetailDialogOpen}>
                 <DialogContent className="scrollbar-thin max-h-[min(760px,calc(100vh-2rem))] scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto sm:max-w-2xl scrollbar-hover:scrollbar-thumb-muted-foreground">

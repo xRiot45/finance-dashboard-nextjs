@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { DownloadIcon } from "lucide-react"
+import { BarChart3Icon, DownloadIcon } from "lucide-react"
 
 import { mockAccounts } from "@/features/accounts"
 import { mockBudgets } from "@/features/budgets"
@@ -19,7 +19,9 @@ import {
 } from "@/features/reports/constants/report-options"
 import { buildReportViewModel, type ReportFilterState } from "@/features/reports/utils/report-view-models"
 import { mockTransactions } from "@/features/transactions"
-import { Alert, AlertDescription, AlertTitle } from "@/shared/components/ui/alert"
+import { CoreEmptyState } from "@/shared/components/core-empty-state"
+import { CoreErrorState } from "@/shared/components/core-error-state"
+import { CoreLoadingState } from "@/shared/components/core-loading-state"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import {
@@ -30,7 +32,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/shared/components/ui/dialog"
-import { Skeleton } from "@/shared/components/ui/skeleton"
 import { formatNumber } from "@/shared/utils"
 
 const ACTIVE_WORKSPACE_ID = "wks_acme"
@@ -48,7 +49,7 @@ export function ReportsWorkbench() {
     const [lens, setLens] = useState<ReportLens>("cash-flow")
     const [filters, setFilters] = useState<ReportFilterState>(DEFAULT_FILTERS)
     const [isExportDialogOpen, setIsExportDialogOpen] = useState(false)
-    const [dataState] = useState<ReportDataState>("ready")
+    const [dataState, setDataState] = useState<ReportDataState>("ready")
 
     const reportViewModel = useMemo(
         () =>
@@ -65,6 +66,7 @@ export function ReportsWorkbench() {
     )
     const lensOption = getReportLensOption(lens)
     const groupByOption = getReportGroupByOption(filters.groupBy)
+    const hasNoReportEvidence = reportViewModel.evidenceRows.length === 0
 
     function updateFilters(nextFilters: Partial<ReportFilterState>) {
         setFilters((currentFilters) => ({ ...currentFilters, ...nextFilters }))
@@ -127,68 +129,98 @@ export function ReportsWorkbench() {
 
             <ReportLensSelector lens={lens} onLensChange={setLens} />
 
-            {dataState === "error" ? (
-                <Alert variant="destructive">
-                    <AlertTitle>Report data could not be refreshed</AlertTitle>
-                    <AlertDescription>
-                        The current local dataset is unavailable. Keep the saved view controls and try again after the
-                        report source is ready.
-                    </AlertDescription>
-                </Alert>
-            ) : null}
-
             {dataState === "loading" ? (
-                <ReportLoadingState />
+                <CoreLoadingState
+                    description="Loading analysis lenses, period points, evidence rows, and budget variance summaries."
+                    icon={BarChart3Icon}
+                    meta="Analysis sync"
+                    title="Loading report analysis"
+                    variant="report"
+                />
+            ) : dataState === "error" ? (
+                <CoreErrorState
+                    description="Report data could not be refreshed, so charts and evidence tables are paused before showing an incomplete analysis."
+                    icon={BarChart3Icon}
+                    onRetry={() => setDataState("ready")}
+                    recoveryItems={[
+                        "Keep the current lens and period.",
+                        "Retry the report refresh.",
+                        "Export only after evidence rows return.",
+                    ]}
+                    title="Report data could not be refreshed"
+                />
+            ) : hasNoReportEvidence ? (
+                <CoreEmptyState
+                    description="The selected lens and period have no supporting records. Reports need transaction evidence before charts and drivers can explain movement."
+                    icon={BarChart3Icon}
+                    meta="No evidence rows"
+                    secondaryAction={{
+                        label: "Reset report view",
+                        onClick: () => {
+                            setLens("cash-flow")
+                            setFilters(DEFAULT_FILTERS)
+                        },
+                    }}
+                    steps={[
+                        "Widen the report period.",
+                        "Switch to the cash flow lens.",
+                        "Add transactions for this workspace.",
+                    ]}
+                    title="No report evidence"
+                />
             ) : (
-                <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
-                    <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                        <CardHeader>
-                            <div>
-                                <CardTitle>{lensOption.label} lens</CardTitle>
+                <>
+                    <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]">
+                        <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                            <CardHeader>
+                                <div>
+                                    <CardTitle>{lensOption.label} lens</CardTitle>
+                                    <CardDescription>
+                                        Grouped by {groupByOption.label.toLowerCase()} from {filters.dateFrom} to{" "}
+                                        {filters.dateTo}.
+                                    </CardDescription>
+                                </div>
+                            </CardHeader>
+                            <CardContent>
+                                <ReportLensChart
+                                    breakdown={reportViewModel.breakdown}
+                                    lens={lens}
+                                    periodPoints={reportViewModel.periodPoints}
+                                />
+                            </CardContent>
+                        </Card>
+
+                        <ReportInsightPanel lens={lens} summary={reportViewModel.lensSummary} />
+                    </div>
+
+                    <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
+                        <Card className="border-border/70 bg-card/95 shadow-xs">
+                            <CardHeader>
+                                <CardTitle>Top drivers</CardTitle>
                                 <CardDescription>
-                                    Grouped by {groupByOption.label.toLowerCase()} from {filters.dateFrom} to{" "}
-                                    {filters.dateTo}.
+                                    The categories or plans most responsible for the current lens.
                                 </CardDescription>
-                            </div>
-                        </CardHeader>
-                        <CardContent>
-                            <ReportLensChart
-                                breakdown={reportViewModel.breakdown}
-                                lens={lens}
-                                periodPoints={reportViewModel.periodPoints}
-                            />
-                        </CardContent>
-                    </Card>
+                            </CardHeader>
+                            <CardContent>
+                                <ReportBreakdownList items={reportViewModel.breakdown} />
+                            </CardContent>
+                        </Card>
 
-                    <ReportInsightPanel lens={lens} summary={reportViewModel.lensSummary} />
-                </div>
+                        <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
+                            <CardHeader>
+                                <CardTitle>Evidence table</CardTitle>
+                                <CardDescription>
+                                    {formatNumber(reportViewModel.evidenceRows.length)} records supporting this report
+                                    view.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ReportEvidenceTable rows={reportViewModel.evidenceRows} />
+                            </CardContent>
+                        </Card>
+                    </div>
+                </>
             )}
-
-            <div className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
-                <Card className="border-border/70 bg-card/95 shadow-xs">
-                    <CardHeader>
-                        <CardTitle>Top drivers</CardTitle>
-                        <CardDescription>
-                            The categories or plans most responsible for the current lens.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ReportBreakdownList items={reportViewModel.breakdown} />
-                    </CardContent>
-                </Card>
-
-                <Card className="min-w-0 border-border/70 bg-card/95 shadow-xs">
-                    <CardHeader>
-                        <CardTitle>Evidence table</CardTitle>
-                        <CardDescription>
-                            {formatNumber(reportViewModel.evidenceRows.length)} records supporting this report view.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <ReportEvidenceTable rows={reportViewModel.evidenceRows} />
-                    </CardContent>
-                </Card>
-            </div>
 
             <Dialog open={isExportDialogOpen} onOpenChange={setIsExportDialogOpen}>
                 <DialogContent>
@@ -211,32 +243,6 @@ export function ReportsWorkbench() {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </div>
-    )
-}
-
-function ReportLoadingState() {
-    return (
-        <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_360px]" aria-label="Loading report analysis">
-            <Card className="border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <Skeleton className="h-5 w-40" />
-                    <Skeleton className="h-4 w-64" />
-                </CardHeader>
-                <CardContent>
-                    <Skeleton className="h-[320px] w-full" />
-                </CardContent>
-            </Card>
-            <Card className="border-border/70 bg-card/95 shadow-xs">
-                <CardHeader>
-                    <Skeleton className="h-5 w-36" />
-                    <Skeleton className="h-4 w-48" />
-                </CardHeader>
-                <CardContent className="flex flex-col gap-3">
-                    <Skeleton className="h-24" />
-                    <Skeleton className="h-16" />
-                </CardContent>
-            </Card>
         </div>
     )
 }
